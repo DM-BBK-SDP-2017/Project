@@ -34,6 +34,12 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
   import driver.api._
 
+///  ____  __     __    ___  ____
+/// (  _ \(  )   /  \  / __)/ ___)
+///  ) _ (/ (_/\(  O )( (_ \\___ \
+/// (____/\____/ \__/  \___/(____/
+///
+
   val blogs = TableQuery[Blogs]
 
   def getBlogs() = SecuredAction.async { implicit request =>
@@ -53,7 +59,11 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
 
     val blog = request.body.as[Blog]
 
-    val b = Blog("",""+request.user.id, request.user.nickname, new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()), blog.what)
+    val b = Blog(
+      "",""+request.user.id,
+      request.user.nickname,
+      new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()),
+      blog.what)
 
     db.run( (blogs += b).asTry ).map( res =>
      res match {
@@ -66,6 +76,12 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
     )
     //Future.successful(Ok("added"))
   }
+
+///   __   ____  ____  ____  ____  __    ___  ____  ____
+///  / _\ (  _ \(_  _)(  __)(  __)/ _\  / __)(_  _)/ ___)
+/// /    \ )   /  )(   ) _)  ) _)/    \( (__   )(  \___ \
+/// \_/\_/(__\_) (__) (____)(__) \_/\_/ \___) (__) (____/
+
 
   val artefacts = TableQuery[Artefacts]
 
@@ -87,7 +103,13 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
     val artefact = request.body.as[Artefact]
 
     //val b = Artefact(id = "text", content = new HTML,creator = request.user)
-    val b = Artefact("",""+request.user.id, artefact.content)
+    val b = Artefact(
+      artefact.id,
+      artefact.content,
+      request.user.id.toString,
+      artefact.categories_id,
+      artefact.tags_id,
+      new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
 
     db.run( (artefacts += b).asTry ).map( res =>
       res match {

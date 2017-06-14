@@ -2,9 +2,9 @@
 @import helper._
 @import play.i18n.Messages
 
-@main( "BlogDog" , loginForm ,user) {
+@main( play.Play.application().configuration().getString("application.name") , loginForm ,user) {
 
- <button type="button" class="btn btn-default btn-danger" id="postButton" onClick="add()">New Post</button>
+ <button type="button" class="btn btn-default btn- " id="postButton" onClick="add()">New Post</button>
 
 <div class="well" id="blogs">
   
