@@ -25,9 +25,14 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
 
   val loginForm = Form(
     mapping(
+      "id" -> number,
       "user" -> text,
       "password" -> text,
-      "nickname" -> text)(User.apply)(User.unpick))
+      "nickname" -> text)(User.apply[User])(User.unpick _))
+
+
+  //classOf[SomeClass].getMethod("someMethod", classOf[String]).invoke(this, "Some arg")
+
 
   def index = Action {
     Redirect(routes.Application.list())
@@ -48,12 +53,33 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
     }
   }
 
+  def feed = Action { implicit request =>
+
+    request.session.get("user").map { u =>
+
+    val auth = cache.get[User](u)
+
+    if ( ! auth.isEmpty )
+      Ok(views.html.feed(null, loginForm, auth.get.user))
+    else
+      Ok(views.html.feed(null, loginForm, null))
+  }.getOrElse{
+    Ok(views.html.feed(null, loginForm, null))
+  }
+}
+
+
+
+
   val login = Action(parse.form(loginForm)) {
     implicit request =>
 
+
+
+
       val loginData = request.body
 
-      val q = users.filter { u => u.user === loginData.user && u.password === loginData.password }
+    val q = users.filter { u => u.user === loginData.user && u.password === loginData.password }
 
       var id:String = ""
       Await.result(db.run(q.result), Duration.Inf).map { u =>

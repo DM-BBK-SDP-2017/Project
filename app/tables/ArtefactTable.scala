@@ -16,13 +16,15 @@ trait ArtefactTable {
 
     def id = column[Int]("ID",O.PrimaryKey,O.AutoInc)
     def content = column[String]("CONTENT")
-    def creator_id = column[String]("CREATOR_ID")
+    def creator_id = column[Int]("CREATOR_ID")
     def categories_id = column[Int]("CATEGORIES_ID")
     def tags_id = column[Int]("TAGS_ID")
     def created = column[Timestamp]("CREATED")
 
 
     def * = (id,content,creator_id, categories_id, tags_id, created) <> (Artefact.tupled, Artefact.unapply _)
+   //def * = (id,content,creator_id, categories_id, tags_id, created) <> ( {tuple: (Int,String, Int, Int, Int, Timestamp) => Artefact(id,content,creator_id, categories_id, tags_id, created) },
+   //  Artefact.unapply _)
   }
 }
 

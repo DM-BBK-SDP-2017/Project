@@ -13,13 +13,12 @@ trait BlogTable {
   import driver.api._
   class Blogs(tag: Tag) extends Table[Blog](tag, "BLOGS") {
     
-    def id = column[String]("ID",O.PrimaryKey,O.AutoInc)
-    def users_id = column[String]("USERS_ID")
-    def user = column[String]("USER")
+    def id = column[Int]("ID",O.PrimaryKey,O.AutoInc)
+    def users_id = column[Int]("USERS_ID")
     def when = column[Timestamp]("WHEN")
     def what = column[String]("WHAT")
 
-    def * = (id,users_id,user,when,what) <> (Blog.tupled, Blog.unapply _)
+    def * = (id,users_id,when,what) <> (Blog.tupled, Blog.unapply _)
   }
 }
 

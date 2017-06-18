@@ -45,9 +45,8 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
   def getBlogs() = SecuredAction.async { implicit request =>
 
     val myblogs = for {
-      c <- blogs.sortBy { x => x.when.desc } if c.user === request.user.nickname
+      c <- blogs.sortBy { x => x.when.desc } if c.users_id === request.user.id
     } yield (c)
-
     db.run(myblogs.result).map { res =>
       {
         Ok(Json.toJson(res))
@@ -60,8 +59,8 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
     val blog = request.body.as[Blog]
 
     val b = Blog(
-      "",""+request.user.id,
-      request.user.nickname,
+      0,
+      request.user.id,
       new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()),
       blog.what)
 
@@ -104,9 +103,9 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
 
     //val b = Artefact(id = "text", content = new HTML,creator = request.user)
     val b = Artefact(
-      artefact.id,
+      0,
       artefact.content,
-      request.user.id.toString,
+      request.user.id,
       artefact.categories_id,
       artefact.tags_id,
       new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))

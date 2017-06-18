@@ -11,6 +11,8 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET     /list						controllers.Application.list
 
+GET     /feed                       controllers.Application.feed
+
 GET		/api/blogs			        controllers.Api.getBlogs
 
 POST	/api/blogs					controllers.Api.postBlog
