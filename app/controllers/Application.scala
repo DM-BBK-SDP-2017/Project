@@ -24,21 +24,26 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
   val users = TableQuery[Users]
 
   val loginForm = Form(
+
     mapping(
       "id" -> number,
       "user" -> text,
       "password" -> text,
-      "nickname" -> text)(User.apply[User])(User.unpick _))
+      "nickname" -> text)(User.apply)(User.unpick _))
 
 
   //classOf[SomeClass].getMethod("someMethod", classOf[String]).invoke(this, "Some arg")
 
 
   def index = Action {
+
+
     Redirect(routes.Application.list())
   }
 
   def list = Action { implicit request =>
+
+
 
     request.session.get("user").map { u =>
 
@@ -73,6 +78,7 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
 
   val login = Action(parse.form(loginForm)) {
     implicit request =>
+
 
 
 
