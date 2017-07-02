@@ -45,9 +45,7 @@ function postArtefactTags(tag) {
         data : tagjson,
         url : "/api/artefacttag",
         success : function(data) {
-            console.log(data);
-
-            loadData();
+            console.log('Posted ' + data);
         },
         error : function(response) {
             alert("error " + response.statusText + ":"+ response.status+" - " +response.responseText)

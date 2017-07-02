@@ -109,16 +109,16 @@ class Api @Inject() (cache: CacheApi)
     //val artefactTag_Results = db.run(artefact_tags.result).value
 
 
-    val q = for (a <- artefact_tags) yield a.artefact_Tag -> a.artefact_Tag_Id
-    val a = q.result
-    val results = Await.result(db.run(a), Duration("2 seconds")).toMap
-    Logger.info(results.toString)
+    // val q = for (a <- artefact_tags) yield a.artefact_Tag -> a.artefact_Tag_Id
+    // val a = q.result
+    // val results = Await.result(db.run(a), Duration("2 seconds")).toMap
+    // Logger.info(results.toString)
     //val artefactTag_Results: Map[String,Int] = Await.result(db.run(a), 1 second)
 
 
-    for (t <- artefact.tags_ids_string.split(",") ) {
-      //if (!results.contains)
-    }
+    //
+    //
+    //
 
 
     val b = Artefact(
@@ -127,12 +127,38 @@ class Api @Inject() (cache: CacheApi)
       creator = request.user.id,
       //categories_id = artefact.categories_id,
       //tags_ids_string = (for (a <- artefact.tags_ids_string.split(',')) yield {artefactTag_Results.get.filter(x => x.artefact_Tag_Id === a).artefact_Tag_Id}).mkString(","),
-      tags_ids_string = artefact.tags_ids_string.split(",").map(x => results.get(x)).mkString(","),
+      // DOESN'T ALWAYS STORE TAGS tags_ids_string = artefact.tags_ids_string.split(",").map(x => results.get(x)).mkString(","),
+      tags_ids_string = artefact.tags_ids_string,
       created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
 
     db.run((artefacts += b).asTry).map(res =>
       res match {
-        case Success(res) => Ok(Json.toJson(b))
+        case Success(res) => {
+          Ok(Json.toJson(b))
+
+     //     val q = for (a <- artefact_tags) yield a.artefact_Tag
+     //     val a = q.result
+     //     val results = db.run(a)
+//
+     //     results.onComplete {
+     //       case Success(x) => {
+     //         val artefact_tags = TableQuery[ArtefactTags]
+//
+     //         for (t <- artefact.tags_ids_string.split(",") ) {
+     //           if (!x.contains(t)) {db.run(artefact_tags += ArtefactTag(
+     //             artefact_Tag_Id = 0,
+     //             artefact_Tag = t,
+     //             creator_id = request.user.id,
+     //             created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))}
+     //         }
+     //         x
+     //       }
+     //       case Failure (x)=> Logger.info(s"Writing artefact $x failed");
+//
+//
+     //     }
+
+        }
         case Failure(e) => {
           Logger.error(s"Problem on insert, ${e.getMessage}")
           InternalServerError(s"Problem on insert, ${e.getMessage}")
@@ -180,6 +206,10 @@ class Api @Inject() (cache: CacheApi)
 
   def postArtefactTag = SecuredAction.async(parse.json) { implicit request =>
 
+  // for debugging 500 error
+
+    Logger.info(request.body.toString)
+
     val artefactTag = request.body.as[ArtefactTag]
 
     //   artefact_Tag_Id: Int,
@@ -193,6 +223,9 @@ class Api @Inject() (cache: CacheApi)
       artefact_Tag = artefactTag.artefact_Tag,
       creator_id = request.user.id,
       created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
+
+    // To try to fix issue of 500 error
+    Thread.sleep(200)
 
 
       db.run((artefact_tags += b).asTry).map(res =>

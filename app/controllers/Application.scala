@@ -32,6 +32,8 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
       "nickname" -> text)(User.apply)(User.unpick _))
 
 
+
+
   //classOf[SomeClass].getMethod("someMethod", classOf[String]).invoke(this, "Some arg")
 
 
@@ -42,8 +44,6 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
   }
 
   def list = Action { implicit request =>
-
-
 
     request.session.get("user").map { u =>
 
@@ -58,18 +58,36 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
     }
   }
 
-  def feed = Action { implicit request =>
+  def feed = Action {
+
+    implicit request =>
+
+      request.session.get("user").map { u =>
+
+        val auth = cache.get[User](u)
+
+        if ( ! auth.isEmpty )
+          Ok(views.html.feed(null, loginForm, auth.get.user))
+        else
+          Ok(views.html.feed(null, loginForm, null))
+      }.getOrElse{
+        Ok(views.html.feed(null, loginForm, null))
+      }
+
+  }
+
+  def artefacts = Action { implicit request =>
 
     request.session.get("user").map { u =>
 
     val auth = cache.get[User](u)
 
     if ( ! auth.isEmpty )
-      Ok(views.html.feed(null, loginForm, auth.get.user))
+      Ok(views.html.artefacts(null, loginForm, auth.get.user))
     else
-      Ok(views.html.feed(null, loginForm, null))
+      Ok(views.html.artefacts(null, loginForm, null))
   }.getOrElse{
-    Ok(views.html.feed(null, loginForm, null))
+    Ok(views.html.artefacts(null, loginForm, null))
   }
 }
 
