@@ -21,6 +21,12 @@ GET     /api/artefacts              controllers.Api.getArtefacts
 
 POST    /api/artefacts              controllers.Api.postArtefact
 
+GET     /api/artefacttags              controllers.Api.getArtefactTags
+
+GET     /api/artefacttagsforfeed              controllers.Api.getArtefactTagsForFeed
+
+POST    /api/artefacttag             controllers.Api.postArtefactTag
+
 POST  /login						controllers.Application.login
 
 GET   /logout						controllers.Application.logout

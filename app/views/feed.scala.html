@@ -1,9 +1,16 @@
 @(artefacts:List[Artefact],loginForm:play.api.data.Form[User],user:String)(implicit messages: Messages)
 
 
+
 @main( play.Play.application().configuration().getString("application.name") , loginForm ,user) {
 
-    <button type="button" class="btn btn-default btn- " id="postButton" onClick="add()">New Artefact</button>
+	<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/magicsuggest-min.css")">
+	<script src='@routes.Assets.at("javascripts/magicsuggest/magicsuggest-min.js")' type="text/javascript"></script>
+	<script src='@routes.Assets.at("javascripts/feedhelper.js")' type="text/javascript"></script>
+
+
+
+	<button type="button" class="btn btn-default btn- " id="postButton" onClick="add()">New Artefact</button>
 
     <div class="well" id="artefacts">
 
@@ -25,6 +32,11 @@
                                 <textarea style="overflow:auto;resize:none;min-width: 80%" draggable="false"
                                 class="form-control" id="info" name="info" rows="5"></textarea>
                             </dd>
+                            <br>
+                            <dt><label class="tagslabel">tags</label></dt>
+                            <div style="resize:none;min-width: 80%" draggable="false"
+                                class="form-control2" id="tags" name="tags">
+                            </div>
                         </dl>
                         <button id = "submitArtefactButton" class="btn btn-primary" data-dismiss="modal" type="button">Submit</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -37,48 +49,102 @@
 
     <script>
 
+
+			var tags = [];
+			var ms;
+
+            $(document).ready(function() {
+                $("#tags").hide();
+
+				msex = function() {
+
+					    ms = $('#tags').magicSuggest({
+						allowFreeEntries: true,
+							placeholder: 'Begin typing to search for existing tags or add your own',
+							vregex: /^[a-z0-9_-]{1,20}$/,
+							data: tags
+					});
+
+					    console.log('data tags size ' + ms.getData().length);
+				};
+
+				getArtefactTags(msex);
+
+
+            });
+
+            $(".tagslabel").click(function(){
+                $("#tags").toggle(500);
+            });
+
+
+			function add() {
+				//console.log("START MODAL");
+				$('#addArtefact').modal('show');
+				$('#info').select();
+			}
+
+			$('#postButton').hover(
+					function() {
+						add();
+					}
+			);
+			$('#postButton').click(
+					function() {
+						$('#addArtefact').modal('hide');
+					}
+			);
+
+
+
+
         @if( user == null ) {
 	$('#postButton').prop('disabled', true);
 } else {
 	$('#postButton').prop('disabled', false);
 }
 
-
-	function loadData() {
-		$.getJSON(
-			"api/artefacts",
-			function(data) {
-				$("#artefacts").empty();
-				$.each(	data,function(key, j) {
-					var head = '<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">The title</h3></div>'
-					head = head	+ '<div class="panel-body">'
-
-					var newone =  j.content
-					var tail = '</div><div class="panel-footer">Panel Footer</div></div>'
-					console.log(newone)
-					$("#artefacts").append(
-						head + newone + tail);
-					});
-
-			}).fail(function(response) {
-				console.log("error " + response.statusText + ":"+ response.status+" - " +response.responseText)
-			  })
-	}
 	loadData();
-
-
-
-
 
 
 	var error = null;
 	$('#submitArtefactButton').on(
 			'click',
 			function(e) {
+
+				// POST NEW ARTEFACT TAGS
+
+				for (var i = 0; i < ms.getValue().length; i++) {
+
+					console.log('length '  + tags.length);
+
+					if (tags.indexOf(ms.getValue()[i]) == -1) {
+
+						postArtefactTags(ms.getValue()[i]);
+						tags.push(ms.getValue()[i]);
+
+					}
+				}
+
+
+
+				// POST NEW ARTEFACT
+
+				// Retrieve tag values
+
+				var tagValues = ms.getValue();
+
+
+
 				var user = $('#user').val()
 				var info = $('#info').val()
-				var json = '{ "content":"' + info.replace(/[\r?\n]/g, " ") + '", "categories_id": 0, "tags_id": 0 }'
-				console.log(json)
+				//var tags = $('#tags').getValue()
+				var json = '{ "id": 0, "content":"' + info.replace(/[\r?\n]/g, " ") + '", "creator": 0, "created": "1971-01-01T00:00:00.000" }'
+
+
+				var newArtefactId = "";
+
+				//console.log(json)
 				$('#user').val('')
 				$('#info').val('')
 				e.preventDefault();
@@ -89,30 +155,25 @@
 					url : "/api/artefacts",
 					success : function(data) {
 						console.log(data);
+						//newArtefactId = data.get();
+
+
 						loadData();
 					},
 					error : function(response) {
 						alert("error " + response.statusText + ":"+ response.status+" - " +response.responseText)
 					}
 				});
+
+				// POST ARTEFACT/TAG ASSOCIATIONS
+
+
+
+
+
 			});
 
-	function add() {
-		console.log("START MODAL");
-		$('#addArtefact').modal('show');
-	    $('#info').select();
-	}
 
-	$('#postButton').hover(
-		function() {
-			add();
-		 }
-	);
-	$('#postButton').click(
-			function() {
-				$('#addArtefact').modal('hide');
-			}
-		);
 </script>
 
 }

@@ -1,10 +1,11 @@
 @(blogs:List[Blog],loginForm:   play.api.data.Form[User],user:String)(implicit messages: Messages)
 @import helper._
+	@import tables._
 @import play.i18n.Messages
 
 @main( play.Play.application().configuration().getString("application.name") , loginForm ,user) {
 
- <button type="button" class="btn btn-default btn- " id="postButton" onClick="add()">New Post</button>
+ <button type="button" class="btn btn-default btn- " id="postButton" onClick="add()">New Blog</button>
 
 <div class="well" id="blogs">
   
@@ -53,7 +54,7 @@
 				$("#blogs").empty();
 				$.each(	data,function(key, j) {
 					var head = '<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">'
-						+ j.when + ' by '	+ j.user	+ '</h3></div>'
+						+ j.when + ' by '	+ j.users_id	+ '</h3></div>'
 					head = head	+ '<div class="panel-body">'
 
 					var newone =  j.what
@@ -75,7 +76,14 @@
 			function(e) {
 				var user = $('#user').val()
 				var info = $('#info').val()
-				var json = '{ "id": "0" , "users_id":"0","user": "na" , "when":"1971-01-01T00:00:00.000", "what":"' + info.replace(/[\r?\n]/g, " ") + '" }'
+				var json = '{ "id": 0 , "users_id": 0,"when":"1971-01-01T00:00:00.000", "what":"' + info.replace(/[\r?\n]/g, " ") + '" }'
+
+			//id:Int,
+               // users_id:Int,
+               // when: Timestamp,
+               // what: String)
+
+
 				console.log(json)	
 				$('#user').val('')
 				$('#info').val('')
@@ -101,11 +109,11 @@
 	    $('#info').select(); 
 	}
 	
-	$('#postButton').hover(	
-		function() {
-			add();
-		 }
-	);
+	 $('#postButton').hover(
+	 	function() {
+	 		add();
+	 	 }
+	 );
 	$('#postButton').click(	
 			function() {
 				$('#addPost').modal('hide');

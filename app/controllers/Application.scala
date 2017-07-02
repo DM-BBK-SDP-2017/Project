@@ -73,15 +73,8 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
   }
 }
 
-
-
-
   val login = Action(parse.form(loginForm)) {
     implicit request =>
-
-
-
-
 
       val loginData = request.body
 
@@ -95,7 +88,7 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
         cache.set(id, u)
       }
 
-      Redirect(routes.Application.list()).withSession(
+      Redirect(routes.Application.feed()).withSession(
           "user" -> id)
 
   }

@@ -19,10 +19,6 @@ import java.util.Calendar
 import models.Blog.timestampFormat
 import play.api.cache._
 import javax.inject.Inject
-import javax.swing.text.html.HTML
-
-
-import models.User
 
 import scala.util.Try
 import scala.util.Success
@@ -30,15 +26,23 @@ import scala.util.Failure
 import play.Logger
 import play.twirl.api.Html
 
-class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with ArtefactTable with HasDatabaseConfig[JdbcProfile] {
+class Api @Inject() (cache: CacheApi)
+
+  extends Controller
+  with BlogTable
+  with ArtefactTable
+  with ArtefactTagTable
+  with HasDatabaseConfig[JdbcProfile] {
+
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
+
   import driver.api._
 
-///  ____  __     __    ___  ____
-/// (  _ \(  )   /  \  / __)/ ___)
-///  ) _ (/ (_/\(  O )( (_ \\___ \
-/// (____/\____/ \__/  \___/(____/
-///
+  ///  ____  __     __    ___  ____
+  /// (  _ \(  )   /  \  / __)/ ___)
+  ///  ) _ (/ (_/\(  O )( (_ \\___ \
+  /// (____/\____/ \__/  \___/(____/
+  ///
 
   val blogs = TableQuery[Blogs]
 
@@ -47,10 +51,9 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
     val myblogs = for {
       c <- blogs.sortBy { x => x.when.desc } if c.users_id === request.user.id
     } yield (c)
-    db.run(myblogs.result).map { res =>
-      {
-        Ok(Json.toJson(res))
-      }
+    db.run(myblogs.result).map { res => {
+      Ok(Json.toJson(res))
+    }
     }
   }
 
@@ -64,22 +67,23 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
       new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()),
       blog.what)
 
-    db.run( (blogs += b).asTry ).map( res =>
-     res match {
+    db.run((blogs += b).asTry).map(res =>
+      res match {
         case Success(res) => Ok(Json.toJson(b))
         case Failure(e) => {
+          Logger.info(request.user.id.toString)
           Logger.error(s"Problem on insert, ${e.getMessage}")
           InternalServerError(s"Problem on insert, ${e.getMessage}")
         }
-     }        
+      }
     )
     //Future.successful(Ok("added"))
   }
 
-///   __   ____  ____  ____  ____  __    ___  ____  ____
-///  / _\ (  _ \(_  _)(  __)(  __)/ _\  / __)(_  _)/ ___)
-/// /    \ )   /  )(   ) _)  ) _)/    \( (__   )(  \___ \
-/// \_/\_/(__\_) (__) (____)(__) \_/\_/ \___) (__) (____/
+  ///   __   ____  ____  ____  ____  __    ___  ____  ____
+  ///  / _\ (  _ \(_  _)(  __)(  __)/ _\  / __)(_  _)/ ___)
+  /// /    \ )   /  )(   ) _)  ) _)/    \( (__   )(  \___ \
+  /// \_/\_/(__\_) (__) (____)(__) \_/\_/ \___) (__) (____/
 
 
   val artefacts = TableQuery[Artefacts]
@@ -90,8 +94,7 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
       c <- artefacts.sortBy { x => x.id.desc }
     } yield (c)
 
-    db.run(getartefacts.result).map { res =>
-    {
+    db.run(getartefacts.result).map { res => {
       Ok(Json.toJson(res))
     }
     }
@@ -101,16 +104,15 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
 
     val artefact = request.body.as[Artefact]
 
-    //val b = Artefact(id = "text", content = new HTML,creator = request.user)
     val b = Artefact(
-      0,
-      artefact.content,
-      request.user.id,
-      artefact.categories_id,
-      artefact.tags_id,
-      new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
+      id = 0,
+      content = artefact.content,
+      creator = request.user.id,
+      //categories_id = artefact.categories_id,
+      //tags_id = artefact.tags_id,
+      created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
 
-    db.run( (artefacts += b).asTry ).map( res =>
+    db.run((artefacts += b).asTry).map(res =>
       res match {
         case Success(res) => Ok(Json.toJson(b))
         case Failure(e) => {
@@ -123,6 +125,68 @@ class Api @Inject() (cache: CacheApi) extends Controller with BlogTable with Art
   }
 
 
+  // ARTEFACT_TAGS
 
+  val artefact_tags = TableQuery[ArtefactTags]
+
+  def getArtefactTags() = SecuredAction.async { implicit request =>
+
+    val getartefacttags = for {
+      c <- artefact_tags.sortBy { x => x.artefact_Tag_Id.desc }
+    } yield (c)
+
+    Logger.info(getartefacttags.toString)
+
+    db.run(getartefacttags.result).map { res => {
+      Ok(Json.toJson(res))
+    }
+    }
+  }
+
+  def getArtefactTagsForFeed() = SecuredAction.async { implicit request =>
+
+
+    val getartefacttags = for {
+      c <- artefact_tags.sortBy { x => x.artefact_Tag_Id.desc }
+    } yield (c)
+
+
+    //Json.arr() :+(getartefacttags)
+    db.run(getartefacttags.result).map { res => {
+      Ok(Json.arr() :+ (Json.toJson(res)))
+    }
+    }
+
+
+  }
+
+  def postArtefactTag = SecuredAction.async(parse.json) { implicit request =>
+
+    val artefactTag = request.body.as[ArtefactTag]
+
+    //   artefact_Tag_Id: Int,
+    //   artefact_Tag: String,
+    //   creator_id: Int,
+    //   created: Timestamp)
+
+
+    val b = ArtefactTag(
+      artefact_Tag_Id = 0,
+      artefact_Tag = artefactTag.artefact_Tag,
+      creator_id = request.user.id,
+      created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
+
+
+      db.run((artefact_tags += b).asTry).map(res =>
+        res match {
+          case Success(res) => Ok(Json.toJson(b))
+          case Failure(e) => {
+            Logger.error(s"Problem on insert, ${e.getMessage}")
+            InternalServerError(s"Problem on insert, ${e.getMessage}")
+          }
+        }
+      )
+      //Future.successful(Ok("added"))
+    }
 
 }
