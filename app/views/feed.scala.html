@@ -12,9 +12,7 @@
 
 	<button type="button" class="btn btn-default btn- " id="postButton" onClick="add()">New Artefact</button>
 
-    <div class="well" id="artefacts">
-
-    </div>
+    <div class="well" id="artefacts"></div>
 
     <div class="modal fade" id="addArtefact" role="dialog">
         <div class="modal-dialog">
@@ -62,6 +60,7 @@
 						allowFreeEntries: true,
 							placeholder: 'Begin typing to search for existing tags or add your own',
 							vregex: /^[a-z0-9_-]{1,20}$/,
+							maxSelection: 3,
 							data: tags
 					});
 
@@ -116,8 +115,6 @@
 
 				for (var i = 0; i < ms.getValue().length; i++) {
 
-					console.log('length '  + tags.length);
-
 					if (tags.indexOf(ms.getValue()[i]) == -1) {
 
 						postArtefactTags(ms.getValue()[i]);
@@ -128,21 +125,16 @@
 
 
 
+
+
 				// POST NEW ARTEFACT
 
 				// Retrieve tag values
 
-				var tagValues = ms.getValue();
-
-
-
+				var tags_ids_String = ms.getValue().join();
 				var user = $('#user').val()
 				var info = $('#info').val()
-				//var tags = $('#tags').getValue()
-				var json = '{ "id": 0, "content":"' + info.replace(/[\r?\n]/g, " ") + '", "creator": 0, "created": "1971-01-01T00:00:00.000" }'
-
-
-				var newArtefactId = "";
+				var json = '{ "id": 0, "content":"' + info.replace(/[\r?\n]/g, " ") + '", "tags_ids_string": "' + tags_ids_String + '", "creator": 0, "created": "1971-01-01T00:00:00.000" }'
 
 				//console.log(json)
 				$('#user').val('')
@@ -155,23 +147,13 @@
 					url : "/api/artefacts",
 					success : function(data) {
 						console.log(data);
-						//newArtefactId = data.get();
-
-
 						loadData();
 					},
 					error : function(response) {
 						alert("error " + response.statusText + ":"+ response.status+" - " +response.responseText)
 					}
 				});
-
-				// POST ARTEFACT/TAG ASSOCIATIONS
-
-
-
-
-
-			});
+							});
 
 
 </script>

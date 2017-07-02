@@ -5,6 +5,9 @@
 
 
 
+
+
+
 function loadData() {
     $.getJSON(
         "api/artefacts",
@@ -15,7 +18,8 @@ function loadData() {
                 head = head	+ '<div class="panel-body">'
 
                 var newone =  j.content
-                var tail = '</div><div class="panel-footer">Panel Footer</div></div>'
+                var newoneTag = j.tags_ids_string
+                var tail = '</div><div class="panel-footer">' + newoneTag + '</div></div>'
                 //console.log(newone)
                 $("#artefacts").append(
                     head + newone + tail);
@@ -29,6 +33,10 @@ function loadData() {
 
 
 function postArtefactTags(tag) {
+
+
+
+
 
     var tagjson = '{ "artefact_Tag_Id": 0, "artefact_Tag":"' + tag.replace(/[\r?\n]/g, " ") + '", "creator_id": 0, "created": "1971-01-01T00:00:00.000" }'
     $.ajax({

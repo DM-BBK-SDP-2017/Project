@@ -2,7 +2,7 @@ package controllers
 
 import java.util.Date
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import models._
 import play.api.Play
 import play.api.db.slick.DatabaseConfigProvider
@@ -25,6 +25,9 @@ import scala.util.Success
 import scala.util.Failure
 import play.Logger
 import play.twirl.api.Html
+import slick.backend.DatabasePublisher
+
+import scala.concurrent.duration.Duration
 
 class Api @Inject() (cache: CacheApi)
 
@@ -103,13 +106,28 @@ class Api @Inject() (cache: CacheApi)
   def postArtefact = SecuredAction.async(parse.json) { implicit request =>
 
     val artefact = request.body.as[Artefact]
+    //val artefactTag_Results = db.run(artefact_tags.result).value
+
+
+    val q = for (a <- artefact_tags) yield a.artefact_Tag -> a.artefact_Tag_Id
+    val a = q.result
+    val results = Await.result(db.run(a), Duration("2 seconds")).toMap
+    Logger.info(results.toString)
+    //val artefactTag_Results: Map[String,Int] = Await.result(db.run(a), 1 second)
+
+
+    for (t <- artefact.tags_ids_string.split(",") ) {
+      //if (!results.contains)
+    }
+
 
     val b = Artefact(
       id = 0,
       content = artefact.content,
       creator = request.user.id,
       //categories_id = artefact.categories_id,
-      //tags_id = artefact.tags_id,
+      //tags_ids_string = (for (a <- artefact.tags_ids_string.split(',')) yield {artefactTag_Results.get.filter(x => x.artefact_Tag_Id === a).artefact_Tag_Id}).mkString(","),
+      tags_ids_string = artefact.tags_ids_string.split(",").map(x => results.get(x)).mkString(","),
       created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
 
     db.run((artefacts += b).asTry).map(res =>

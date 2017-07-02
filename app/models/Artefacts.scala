@@ -9,10 +9,11 @@ import slick.driver.JdbcProfile
 case class Artefact(id: Int,
                     content:String,
                     creator: Int,
+                    tags_ids_string: String,
                     created: Timestamp)
 
 
-object Artefact extends ((Int, String, Int, Timestamp) => Artefact) {
+object Artefact extends ((Int, String, Int, String, Timestamp) => Artefact) {
 
   implicit object timestampFormat extends Format[Timestamp] {
     val format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
