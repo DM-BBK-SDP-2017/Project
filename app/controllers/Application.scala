@@ -7,12 +7,18 @@ import play.api.i18n.Messages.Implicits._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.format.Formats._
-import models.User
+import models.{Blog, User}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
 import play.api.db.slick.HasDatabaseConfig
 import javax.inject.Inject
+import models._
+import tables._
+
+
+
 import play.api.cache._
+
 import scala.concurrent.Future
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -35,6 +41,8 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
 
 
   //classOf[SomeClass].getMethod("someMethod", classOf[String]).invoke(this, "Some arg")
+
+
 
 
   def index = Action {
@@ -81,6 +89,10 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
     request.session.get("user").map { u =>
 
     val auth = cache.get[User](u)
+
+
+
+
 
     if ( ! auth.isEmpty )
       Ok(views.html.artefacts(null, loginForm, auth.get.user))

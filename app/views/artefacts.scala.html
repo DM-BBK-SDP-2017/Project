@@ -58,8 +58,8 @@
 
 					    ms = $('#tags').magicSuggest({
 						allowFreeEntries: true,
-							placeholder: 'Begin typing to search for existing tags or add your own',
-							vregex: /^[a-z0-9_-]{1,20}$/,
+							placeholder: 'Begin typing to search for existing tags or to add your own',
+							vregex: /^[a-zA-Z0-9_-]{1,20}$/,
 							maxSelection: 3,
 							data: tags
 					});
@@ -68,7 +68,7 @@
 				};
 
 
-				// IF TIME - CHECK FOR SESSION BEFORE CALLING THIS https://www.playframework.com/documentation/2.5.x/ScalaSessionFlash
+				@*IF TIME - CHECK FOR SESSION BEFORE CALLING THIS https://www.playframework.com/documentation/2.5.x/ScalaSessionFlash*@
 
 				getArtefactTags(msex);
 
@@ -114,7 +114,7 @@
 
 			if (tags.indexOf(ms.getValue()[i]) == -1) {
 
-				postArtefactTags(ms.getValue()[i]);
+				//postArtefactTags(ms.getValue()[i]);
 				tags.push(ms.getValue()[i]);
 
 			}
@@ -143,6 +143,8 @@
 			url : "/api/artefacts",
 			success : function(data) {
 				console.log(data);
+
+				ms.clear();
 				loadData();
 			},
 			error : function(response) {

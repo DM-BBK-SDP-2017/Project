@@ -6,12 +6,11 @@ import javax.swing.text.html.HTML
 import models.{Artefact, Blog, User}
 import slick.driver.JdbcProfile
 import slick.lifted.ProvenShape.proveShapeOf
-
-
+import slick.lifted.TableQuery
 
 trait ArtefactTable {
   protected val driver: JdbcProfile
-  import driver.api._
+    import driver.api._
   class Artefacts(tag: Tag) extends Table[Artefact](tag, "ARTEFACTS") {
 
     def id = column[Int]("ID",O.PrimaryKey,O.AutoInc)

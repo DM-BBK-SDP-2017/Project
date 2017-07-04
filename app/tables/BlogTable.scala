@@ -20,5 +20,7 @@ trait BlogTable {
 
     def * = (id,users_id,when,what) <> (Blog.tupled, Blog.unapply _)
   }
+
+
 }
 

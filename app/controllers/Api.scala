@@ -15,7 +15,6 @@ import slick.driver.JdbcProfile
 import tables._
 import java.sql.Timestamp
 import java.util.Calendar
-
 import models.Blog.timestampFormat
 import play.api.cache._
 import javax.inject.Inject
@@ -89,6 +88,7 @@ class Api @Inject() (cache: CacheApi)
   /// \_/\_/(__\_) (__) (____)(__) \_/\_/ \___) (__) (____/
 
 
+
   val artefacts = TableQuery[Artefacts]
 
   def getArtefacts() = SecuredAction.async { implicit request =>
@@ -134,29 +134,30 @@ class Api @Inject() (cache: CacheApi)
     db.run((artefacts += b).asTry).map(res =>
       res match {
         case Success(res) => {
-          Ok(Json.toJson(b))
 
-     //     val q = for (a <- artefact_tags) yield a.artefact_Tag
-     //     val a = q.result
-     //     val results = db.run(a)
-//
-     //     results.onComplete {
-     //       case Success(x) => {
-     //         val artefact_tags = TableQuery[ArtefactTags]
-//
-     //         for (t <- artefact.tags_ids_string.split(",") ) {
-     //           if (!x.contains(t)) {db.run(artefact_tags += ArtefactTag(
-     //             artefact_Tag_Id = 0,
-     //             artefact_Tag = t,
-     //             creator_id = request.user.id,
-     //             created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))}
-     //         }
-     //         x
-     //       }
-     //       case Failure (x)=> Logger.info(s"Writing artefact $x failed");
-//
-//
-     //     }
+
+          val q = for (a <- artefact_tags) yield a.artefact_Tag
+          val a = q.result
+          val results = db.run(a)
+
+          results.onComplete {
+            case Success(x) => {
+              val artefact_tags = TableQuery[ArtefactTags]
+
+              for (t <- artefact.tags_ids_string.split(",") ) {
+                if (!x.contains(t)) {db.run(artefact_tags += ArtefactTag(
+                  artefact_Tag_Id = 0,
+                  artefact_Tag = t,
+                  creator_id = request.user.id,
+                  created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))}
+              }
+              x
+            }
+            case Failure (x)=> Logger.info(s"Writing artefact $x failed");
+
+
+          }
+          Ok(Json.toJson(b))
 
         }
         case Failure(e) => {
@@ -209,7 +210,7 @@ class Api @Inject() (cache: CacheApi)
   // for debugging 500 error
 
     Logger.info(request.body.toString)
-
+    //Thread.sleep(2000)
     val artefactTag = request.body.as[ArtefactTag]
 
     //   artefact_Tag_Id: Int,
@@ -225,7 +226,7 @@ class Api @Inject() (cache: CacheApi)
       created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
 
     // To try to fix issue of 500 error
-    Thread.sleep(200)
+    //Thread.sleep(200)
 
 
       db.run((artefact_tags += b).asTry).map(res =>
