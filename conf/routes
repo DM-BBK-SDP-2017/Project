@@ -17,11 +17,17 @@ GET     /api/artefacts              controllers.Api.getArtefacts
 
 POST    /api/artefacts              controllers.Api.postArtefact
 
+PUT    /api/artefacts              controllers.Api.updateArtefact
+
+
+
 GET     /api/artefacttags              controllers.Api.getArtefactTags
 
 GET     /api/artefacttagsforfeed              controllers.Api.getArtefactTagsForFeed
 
 POST    /api/artefacttag             controllers.Api.postArtefactTag
+
+GET     /api/artefacts/*idInt     controllers.Api.getArtefactById(idInt)
 
 POST  /login						controllers.Application.login
 

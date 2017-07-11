@@ -15,6 +15,8 @@
         @*Refresh page after 10 minutes of no activity*@
         <meta http-equiv="refresh" content="600">
 
+        @*Glyphicons*@
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 
 
     </head>
@@ -23,32 +25,50 @@
 
             <div class="container-fluid">
 
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="/"> <img src="/assets/images/favicon.png" class="img-responsive" > </a>
-                </div>
+                @*<div class="navbar-header pull-left">
+                <a class="navbar-brand" href="/"> <img src="/assets/images/favicon.png" class="img-responsive" > </a>
+                </div>*@
                 <div>
-                    <ul class="nav navbar-nav">
-                        <li class="active"><a href="/">Home</a></li>
-                        <li><a href="#login" data-toggle="modal" data-target="#login">Login</a></li>
-                        <li><a href="/logout">Logout</a></li>
+                    <ul class="nav navbar-nav pull-right">
+                        @*<li class="active"><a href="/">Home</a></li>*@
+                        @if(user != null) {
+                            <li><a href="/logout">Logout</a></li>
+
+                        } else {
+                            <li><a href="#login" data-toggle="modal" data-target="#login">Login</a></li>
+                        }
+
+
                     </ul>
                 </div>
 
                 <div class="navbar-header">
                 @if(user != null) {
-                    <p class="navbar-text" style="color: yellow">hello @user
+                    <p class="navbar-text" style="color: rgba(21,55,27,0.6)">hello @user
                     </p>
                 } else {
-                    <p class="navbar-text" style="color: yellow;"><b>please sign in</b></p>
+                    <p class="navbar-text pull-right" style="color: rgba(21,55,27,0.6) ;"><b>please sign in</b></p>
                 }</div>
 
             </div>
         </nav>
         <div class="container">
-            <div class="jumbotplay.api.i18n.Messagesron">
-                <h2>@play.Play.application().configuration().getString("application.name")</h2>
 
+            <div class="row">
+                    <!--div class="jumbotplay.api.i18n.Messagesron"-->
+                <div class="col-md-10">
+                    <h2>@play.Play.application().configuration().getString("application.name")</h2>
+
+                </div>
+
+                <div class="col-md-2 align-self-center">
+    <div style="min-height: 10px"> </div>
+
+                    <button type="button" class="btn btn-primary btn-lg" id="postButton" onClick="add()">New Artefact</button>
+                </div>
             </div>
+        </div>
+        <div class="container">
 
 
             @content
@@ -89,7 +109,6 @@
                     </div>
                 </div>
             </div>
-
 
         </div>
 

@@ -103,6 +103,19 @@ class Api @Inject() (cache: CacheApi)
     }
   }
 
+  def getArtefactById(searchId: String) = SecuredAction.async { implicit request =>
+
+
+    val getartefacts = for {
+      c <- artefacts.filter(x => x.id === searchId.toInt)//.sortBy { x => x.id.desc }
+    } yield (c)
+
+    db.run(getartefacts.result).map { res => {
+      Ok(Json.toJson(res))
+    }
+    }
+  }
+
   def postArtefact = SecuredAction.async(parse.json) { implicit request =>
 
     val artefact = request.body.as[Artefact]
@@ -134,7 +147,6 @@ class Api @Inject() (cache: CacheApi)
     db.run((artefacts += b).asTry).map(res =>
       res match {
         case Success(res) => {
-
 
           val q = for (a <- artefact_tags) yield a.artefact_Tag
           val a = q.result
@@ -168,6 +180,92 @@ class Api @Inject() (cache: CacheApi)
     )
     //Future.successful(Ok("added"))
   }
+
+
+  def updateArtefact = SecuredAction.async(parse.json) { implicit request =>
+
+    val artefact = request.body.as[Artefact]
+    Logger.info(artefact.content)
+
+    //val existingArtefactContent = (for { c <- artefacts if c.id === artefact.id } yield (c.content, c.tags_ids_string).update((artefact.content, artefact.tags_ids_string))
+
+    //val existingArtefactContent = for { c <- artefacts if c.id === artefact.id } yield (c.content)
+    val existingArtefactContent = artefacts.filter(_.id === artefact.id).map(c => (c.content, c.tags_ids_string))
+    Logger.info(existingArtefactContent.updateStatement.toString)
+
+    db.run((existingArtefactContent.update((artefact.content, artefact.tags_ids_string)).asTry).map(res => res match {
+      case Success(res) => {
+           Logger.info(res.value.toString  )
+
+        val q = artefact_tags
+        val a = q.result
+        val results = db.run(a)
+
+        results.onComplete {
+          case Success(x) => {
+            val artefact_tags = TableQuery[ArtefactTags]
+
+            for (t <- artefact.tags_ids_string.split(",") ) {
+              if (!x.contains(t)) {db.run(artefact_tags += ArtefactTag(
+                artefact_Tag_Id = 0,
+                artefact_Tag = t,
+                creator_id = request.user.id,
+                created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))}
+            }
+            x
+          }
+          case Failure (x)=> Logger.info(s"Writing artefact $x failed");
+
+
+        }
+
+
+
+           Ok("Updated")
+         }
+         case Failure(e) => {
+           Logger.error(s"Problem on insert, ${e.getMessage}")
+           InternalServerError(s"Problem on insert, ${e.getMessage}")
+         }
+
+
+    })
+    )
+
+
+
+    //  val updateStatement = artefacts.filter(_.id === artefact.id)
+    //    .map (x => (x.content, x.tags_ids_string))
+    //    .update(artefact.content, artefact.tags_ids_string)
+
+    //Logger.info(updateStatement.toString)
+
+    //Future.successful(Ok("Updated"))
+
+
+       // Try(db.run(updateStatement).recover{ex: Throwable => Logger.error("Error occured when inserting user", ex)}) match {
+       //   case Success(e) => {
+       //     Logger.info(e.value.toString)
+       //     Future.successful(Ok("Updated"))
+       //   }
+       //   case Failure(e) => {
+       //     Logger.error(s"Problem on insert, ${e.getMessage}")
+       //     Future.failed(e)
+       //   }
+
+       // }
+
+
+
+    //Ok("success");
+
+
+    //val existingArtefactTags = (for { c <- artefacts if c.id === artefact.id } yield c.tags_ids_string).update(artefact.tags_ids_string)
+
+
+
+  }
+
 
 
   // ARTEFACT_TAGS

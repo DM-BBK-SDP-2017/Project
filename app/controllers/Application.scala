@@ -108,7 +108,10 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
 
       val loginData = request.body
 
-    val q = users.filter { u => u.user === loginData.user && u.password === loginData.password }
+      val q = users.filter { u => u.user === loginData.user && u.password === loginData.password }
+
+//      val q = users.filter { u => u.user === "admin" && u.password === "admin" }
+
 
       var id:String = ""
       Await.result(db.run(q.result), Duration.Inf).map { u =>
@@ -118,7 +121,7 @@ class Application @Inject() (cache: CacheApi) extends Controller with tables.Use
         cache.set(id, u)
       }
 
-      Redirect(routes.Application.feed()).withSession(
+      Redirect(routes.Application.artefacts()).withSession(
           "user" -> id)
 
   }

@@ -1,34 +1,101 @@
 
-body { background: #DCDCFF !important;}
+body { background: #fbfbfb !important;}
  table, th, td {
    border: 1px dotted #ACACCF !important; 
 }
 
 
 .navbar-default {
-  background: #0000FF;
+  background: rgba(0, 61, 14, 0.14);
   border: 0;
   margin-bottom: 0;
-  .navbar-toggle {
-    background: @blue;
-  }
+
 }
 
+.navbar-toggle {
+    background: blue;
+}
 .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
     color: #FFFFFF !important;
-    background-color: #7777AA !important;
+    background-color: rgba(0, 95, 21, 0.44) !important;
 }
 
 .nav > li > a {
     position: relative;
     display: block;
     color: #FFFFFF !important;
-    background-color: #0000AA !important;
+    background-color: #003d0e !important;
 }
 
 .panel-heading {
-    background-color: #DDDDDD !important;
+    /*background-color: #DDDDDD !important;*/
 }
 .jumbotron {
     background-color: #DDDDDD !important;
 }
+
+
+.modal-dialog { /*#artefact-modal-dialogue {*/
+    width: 96%;
+    height: 96%;
+    outline: 0;
+    horiz-align: center;
+
+
+
+}
+
+.modal-content { /* #artefact-modal-content {*/
+    height: 96%;
+    /*min-height: 100%;*/
+    border: none;
+    outline: 0;
+
+}
+
+.modal-header {
+    height: 10%;
+}
+
+.modal-body {
+   height: 90%;
+    border: none;
+    outline: 0;
+
+
+/*min-height: 100%;-->*/
+
+
+}
+
+.form-group {
+    height: 100%;
+    padding-left: 4%;
+    padding-right: 4%;
+    border: none;
+    outline: 0;
+
+
+/*<!--min-height: 100%;-->*/
+
+}
+
+#info {
+    height: 70%;
+    border: none;
+    outline: 0;
+    overflow:auto;
+    resize:none;
+
+}
+
+#tags_container {
+    position:absolute;
+    bottom: 5%;
+}
+
+.mceEditor > table {
+    height: 80% !important;
+}
+
+@import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css");
