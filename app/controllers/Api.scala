@@ -106,11 +106,31 @@ class Api @Inject() (cache: CacheApi)
   def getArtefactById(searchId: String) = SecuredAction.async { implicit request =>
 
 
+
+
+
     val getartefacts = for {
       c <- artefacts.filter(x => x.id === searchId.toInt)//.sortBy { x => x.id.desc }
     } yield (c)
 
     db.run(getartefacts.result).map { res => {
+      Ok(Json.toJson(res))
+    }
+    }
+  }
+
+  def artefactSearch(searchString: String) = SecuredAction.async { implicit request =>
+
+
+    val getartefacts = for {
+      c <- artefacts.filter(x => x.content.like("%"+searchString+"%") || x.tags_ids_string.like("%"+searchString+"%"))//.sortBy { x => x.id.desc }
+
+    } yield (c)
+
+
+
+    db.run(getartefacts.result).map { res => {
+      //Logger.info(res.length)
       Ok(Json.toJson(res))
     }
     }

@@ -19,7 +19,7 @@ POST    /api/artefacts              controllers.Api.postArtefact
 
 PUT    /api/artefacts              controllers.Api.updateArtefact
 
-
+GET     /api/artefacts/search/*arg  controllers.Api.artefactSearch(arg)
 
 GET     /api/artefacttags              controllers.Api.getArtefactTags
 

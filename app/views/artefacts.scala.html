@@ -10,7 +10,36 @@
 	<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
 
 
+	<div class="container">
 
+		<div class="row">
+				<!--div class="jumbotplay.api.i18n.Messagesron"-->
+			<div class="col-md-6">
+				<h2>@play.Play.application().configuration().getString("application.name")</h2>
+			</div>
+
+			@*SEARCH BAR*@
+
+			<div class="col-md-4">
+				<div style="min-height: 15px"> </div>
+				<form id="artefact_search" class="search-form">
+					<div class="form-group has-feedback">
+						<label for="search" class="sr-only">Search</label>
+						<input onsubmit="search()" type="text" class="form-control" name="search" id="search" placeholder="search....">
+						<span class="glyphicon glyphicon-search form-control-feedback"></span>
+					</div>
+				</form>
+			</div>
+
+			@*END SEARCH BAR*@
+
+			<div class="col-md-2 align-self-center">
+				<div style="min-height: 10px"> </div>
+
+				<button type="button" class="btn btn-primary btn-lg" id="postButton" onClick="add()">New Artefact</button>
+			</div>
+		</div>
+	</div>
 
 
 	<div class="well" id="artefacts"></div>
@@ -54,6 +83,17 @@
 	<script>
 
 
+			$('#artefact_search').submit(function(ev) {
+				ev.preventDefault(); // to stop the form from submitting
+				/* Validations go here */
+				//this.submit(); // If all the validations succeeded
+				var values = document.getElementById('search').value;
+				//console.log(values);
+				search(values);
+			});
+
+
+
 			tinymce.init({
 				selector:'#info',
 				placeholder: 'Click here and begin typing',
@@ -70,7 +110,7 @@
 			var ms;
 
 			$(document).ready(function() {
-				$("#tags").hide();
+				//$("#tags").hide();
 
 				msex = function() {
 
@@ -82,7 +122,7 @@
 						data: tags
 					});
 
-					console.log('data tags size ' + ms.getData().length);
+					//console.log('data tags size ' + ms.getData().length);
 				};
 
 
@@ -93,23 +133,23 @@
 
 			});
 
-			$(".tagslabel").click(function(){
-				$("#tags").toggle(500);
-			});
+			//$(".tagslabel").click(function(){
+			//	$("#tags").toggle(500);
+			//});
 
 
 
 
-			$('#postButton').hover(
+			$('#postButton').click(
 					function() {
 						add();
 					}
 			);
-			$('#postButton').click(
-					function() {
-						$('#artefact').modal('hide');
-					}
-			);
+			//$('#postButton').click(
+			//		function() {
+			//			$('#artefact').modal('hide');
+			//		}
+			//);
 
 
 
@@ -121,60 +161,7 @@
 			}
 
 			loadData();
-
-
-			function postTags(func) {
-				for (var i = 0; i < ms.getValue().length; i++) {
-
-					if (tags.indexOf(ms.getValue()[i]) == -1) {
-
-						//postArtefactTags(ms.getValue()[i]);
-						tags.push(ms.getValue()[i]);
-
-					}
-				}
-
-				func();
-
-			}
-
-
-			function postNewArtefact() {
-
-
-				var tags_ids_String = ms.getValue().join();
-				var user = $('#user').val();
-				var info = htmlEncode(tinyMCE.get('info').getContent());
-				//$( infofromtinyMCE ).serialize();
-				//var json = '{ "id": 0, "content":"' + info + '", "tags_ids_string": "' + tags_ids_String + '", "creator": 0, "created": "1971-01-01T00:00:00.000" }'
-
-				var json = '{ "id": 0, "content":"' + info.replace(/[\r?\n]/g, " ") + '", "tags_ids_string": "' + tags_ids_String + '", "creator": 0, "created": "1971-01-01T00:00:00.000" }'
-
-				//console.log(json)
-				$('#user').val('')
-				tinyMCE.get('info').setContent('');
-				$.ajax({
-					type : "POST",
-					contentType : "application/json; charset=utf-8",
-					data : json,
-					url : "/api/artefacts",
-					success : function(data) {
-						console.log(data);
-
-						ms.clear();
-						loadData();
-					},
-					error : function(response) {
-						alert("error " + response.statusText + ":"+ response.status+" - " +response.responseText)
-					}
-				});
-
-
-			}
-
 			var error = null;
-
-
 
 	</script>
 
