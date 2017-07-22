@@ -170,6 +170,7 @@ function loadData() {
                 $("#artefacts").append(
                     head + newone + tail);
                 //test);
+                $("#artefact")
                 tinyMCE.get('info').setContent('');
 
             });
@@ -243,6 +244,9 @@ function search(arg) {
                 $("#artefacts").empty();
                 $.each(data, function (key, j) {
 
+                    var newone = htmlDecode(j.content);
+                    var newoneTag = j.tags_ids_string.toString().replace(/,/g, ", ")
+
                     var dropup = '<div class="btn-group pull-right">\n' +
                         '<button class="btn btn-primary toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true"> <span class="glyphicon glyphicon-cog"></span>\n' +
                         '</button>\n' +
@@ -253,16 +257,16 @@ function search(arg) {
                         '</li>\n' +
                         '</ul>\n' +
                         '</div>'
-                    var head = '<div class="panel panel-primary"><div class="panel-heading clearfix"><h3 class="panel-title pull-left" style="padding-top: 7.5px;">' + j.created + '</h3>' + dropup
+                    var head = '<div class="panel panel-primary" id="artefact"><div class="panel-heading clearfix"><h3 class="panel-title pull-left" style="padding-top: 7.5px;">' + j.created + '</h3>' + dropup
                     head = head + '</div><div class="panel-body">'
 
-                    var newone = htmlDecode(j.content);
-                    var newoneTag = j.tags_ids_string.toString().replace(/,/g, ", ")
+
                     var tail = '</div><div class="panel-footer">' + newoneTag + '</div></div>'
 
                     //console.log(newone)
                     $("#artefacts").append(
-                        head + newone + tail);
+                        head + newone + tail).fadeIn();
+
                     //test);
                     tinyMCE.get('info').setContent('');
 

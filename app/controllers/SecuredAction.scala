@@ -2,14 +2,15 @@ package controllers
 
 import play.api.mvc._
 import play.Logger
+
 import scala.concurrent.Future
 import javax.inject.Inject
+
+import models.Users.User
 import play.api.cache.CacheApi
 import play.mvc.Http.Status
-import models.User
 import play.api.cache.Cache
-import play.api.mvc.{ Request, WrappedRequest }
-import models.User
+import play.api.mvc.{Request, WrappedRequest}
 
 class AuthenticatedRequest[A](val user: User, val request: Request[A])
   extends WrappedRequest[A](request)

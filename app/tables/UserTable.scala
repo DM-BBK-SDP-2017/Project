@@ -2,7 +2,7 @@ package tables
 
 import java.sql.Timestamp
 
-import models.User
+import models.Users.User
 import slick.driver.JdbcProfile
 import slick.lifted.ProvenShape.proveShapeOf
 
@@ -14,7 +14,7 @@ trait UserTable {
   class Users(tag: Tag) extends Table[User](tag, "USERS") {
     
     def id = column[Int]("ID",O.PrimaryKey,O.AutoInc)
-    def  user = column[String]("USER")
+    def user = column[String]("USER")
     def password = column[String]("PASSWORD")
     def nickname = column[String]("NICKNAME")
 

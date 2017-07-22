@@ -16,9 +16,11 @@ libraryDependencies ++= Seq(
  //, "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
   ,"com.typesafe.play" %% "play-slick-evolutions" % "1.1.1",
   "org.scalatestplus" %% "play" % "1.2.0" % "test"
+,
+  "org.jsoup" % "jsoup" % "1.8.3"
 
 
-    //,"org.apache.lucene" % "lucene-analyzers" % "3.4.0"
+  //,"org.apache.lucene" % "lucene-analyzers" % "3.4.0"
 
 )
 

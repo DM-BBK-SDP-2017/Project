@@ -3,7 +3,7 @@ package tables
 import java.sql.Timestamp
 import javax.swing.text.html.HTML
 
-import models.{Artefact, Blog, User}
+import models.{Artefact, Blog}
 import slick.driver.JdbcProfile
 import slick.lifted.ProvenShape.proveShapeOf
 import slick.lifted.TableQuery

@@ -1,0 +1,21 @@
+@import models.Interactions.Interaction
+@import models.Users.User
+@(
+        loginForm:play.api.data.Form[User],
+        user:String
+
+)(implicit messages: Messages)
+
+@main( play.Play.application().configuration().getString("application.name") , loginForm ,user) {
+
+    <script src='@routes.Assets.at("javascripts/AdminJsHelper.js")' type="text/javascript"></script>
+
+    <script>
+            addGroup("group1");
+            addGroup("group2");
+            addGroup("group3");
+    addGroup("group4");
+    </script>
+
+
+}

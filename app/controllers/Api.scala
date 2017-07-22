@@ -8,16 +8,20 @@ import play.api.Play
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.db.slick.HasDatabaseConfig
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import slick.driver.JdbcProfile
 import tables._
 import java.sql.Timestamp
 import java.util.Calendar
+
 import models.Blog.timestampFormat
 import play.api.cache._
 import javax.inject.Inject
+
+import models.Interactions.{Interaction, Message, Recommendation}
+import models.Users.Group
 
 import scala.util.Try
 import scala.util.Success
@@ -31,10 +35,8 @@ import scala.concurrent.duration.Duration
 class Api @Inject() (cache: CacheApi)
 
   extends Controller
-  with BlogTable
-  with ArtefactTable
-  with ArtefactTagTable
-  with HasDatabaseConfig[JdbcProfile] {
+  with AllTables
+    with HasDatabaseConfig[JdbcProfile] {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
@@ -88,7 +90,6 @@ class Api @Inject() (cache: CacheApi)
   /// \_/\_/(__\_) (__) (____)(__) \_/\_/ \___) (__) (____/
 
 
-
   val artefacts = TableQuery[Artefacts]
 
   def getArtefacts() = SecuredAction.async { implicit request =>
@@ -106,11 +107,8 @@ class Api @Inject() (cache: CacheApi)
   def getArtefactById(searchId: String) = SecuredAction.async { implicit request =>
 
 
-
-
-
     val getartefacts = for {
-      c <- artefacts.filter(x => x.id === searchId.toInt)//.sortBy { x => x.id.desc }
+      c <- artefacts.filter(x => x.id === searchId.toInt) //.sortBy { x => x.id.desc }
     } yield (c)
 
     db.run(getartefacts.result).map { res => {
@@ -123,10 +121,10 @@ class Api @Inject() (cache: CacheApi)
 
 
     val getartefacts = for {
-      c <- artefacts.filter(x => x.content.like("%"+searchString+"%") || x.tags_ids_string.like("%"+searchString+"%"))//.sortBy { x => x.id.desc }
+      c <- artefacts.filter(x =>
+        x.content.like("%" + searchString + "%") || x.tags_ids_string.like("%" + searchString + "%")) //.sortBy { x => x.id.desc }
 
     } yield (c)
-
 
 
     db.run(getartefacts.result).map { res => {
@@ -176,16 +174,18 @@ class Api @Inject() (cache: CacheApi)
             case Success(x) => {
               val artefact_tags = TableQuery[ArtefactTags]
 
-              for (t <- artefact.tags_ids_string.split(",") ) {
-                if (!x.contains(t)) {db.run(artefact_tags += ArtefactTag(
-                  artefact_Tag_Id = 0,
-                  artefact_Tag = t,
-                  creator_id = request.user.id,
-                  created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))}
+              for (t <- artefact.tags_ids_string.split(",")) {
+                if (!x.contains(t)) {
+                  db.run(artefact_tags += ArtefactTag(
+                    artefact_Tag_Id = 0,
+                    artefact_Tag = t,
+                    creator_id = request.user.id,
+                    created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))
+                }
               }
               x
             }
-            case Failure (x)=> Logger.info(s"Writing artefact $x failed");
+            case Failure(x) => Logger.info(s"Writing artefact $x failed");
 
 
           }
@@ -215,7 +215,7 @@ class Api @Inject() (cache: CacheApi)
 
     db.run((existingArtefactContent.update((artefact.content, artefact.tags_ids_string)).asTry).map(res => res match {
       case Success(res) => {
-           Logger.info(res.value.toString  )
+        Logger.info(res.value.toString)
 
         val q = artefact_tags
         val a = q.result
@@ -225,33 +225,33 @@ class Api @Inject() (cache: CacheApi)
           case Success(x) => {
             val artefact_tags = TableQuery[ArtefactTags]
 
-            for (t <- artefact.tags_ids_string.split(",") ) {
-              if (!x.contains(t)) {db.run(artefact_tags += ArtefactTag(
-                artefact_Tag_Id = 0,
-                artefact_Tag = t,
-                creator_id = request.user.id,
-                created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))}
+            for (t <- artefact.tags_ids_string.split(",")) {
+              if (!x.contains(t)) {
+                db.run(artefact_tags += ArtefactTag(
+                  artefact_Tag_Id = 0,
+                  artefact_Tag = t,
+                  creator_id = request.user.id,
+                  created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))
+              }
             }
             x
           }
-          case Failure (x)=> Logger.info(s"Writing artefact $x failed");
+          case Failure(x) => Logger.info(s"Writing artefact $x failed");
 
 
         }
 
 
-
-           Ok("Updated")
-         }
-         case Failure(e) => {
-           Logger.error(s"Problem on insert, ${e.getMessage}")
-           InternalServerError(s"Problem on insert, ${e.getMessage}")
-         }
+        Ok("Updated")
+      }
+      case Failure(e) => {
+        Logger.error(s"Problem on insert, ${e.getMessage}")
+        InternalServerError(s"Problem on insert, ${e.getMessage}")
+      }
 
 
     })
     )
-
 
 
     //  val updateStatement = artefacts.filter(_.id === artefact.id)
@@ -263,18 +263,17 @@ class Api @Inject() (cache: CacheApi)
     //Future.successful(Ok("Updated"))
 
 
-       // Try(db.run(updateStatement).recover{ex: Throwable => Logger.error("Error occured when inserting user", ex)}) match {
-       //   case Success(e) => {
-       //     Logger.info(e.value.toString)
-       //     Future.successful(Ok("Updated"))
-       //   }
-       //   case Failure(e) => {
-       //     Logger.error(s"Problem on insert, ${e.getMessage}")
-       //     Future.failed(e)
-       //   }
+    // Try(db.run(updateStatement).recover{ex: Throwable => Logger.error("Error occured when inserting user", ex)}) match {
+    //   case Success(e) => {
+    //     Logger.info(e.value.toString)
+    //     Future.successful(Ok("Updated"))
+    //   }
+    //   case Failure(e) => {
+    //     Logger.error(s"Problem on insert, ${e.getMessage}")
+    //     Future.failed(e)
+    //   }
 
-       // }
-
+    // }
 
 
     //Ok("success");
@@ -283,9 +282,7 @@ class Api @Inject() (cache: CacheApi)
     //val existingArtefactTags = (for { c <- artefacts if c.id === artefact.id } yield c.tags_ids_string).update(artefact.tags_ids_string)
 
 
-
   }
-
 
 
   // ARTEFACT_TAGS
@@ -306,26 +303,28 @@ class Api @Inject() (cache: CacheApi)
     }
   }
 
-  def getArtefactTagsForFeed() = SecuredAction.async { implicit request =>
+  def getArtefactTagsForFeed() = SecuredAction.async {
+
+    implicit request =>
 
 
-    val getartefacttags = for {
-      c <- artefact_tags.sortBy { x => x.artefact_Tag_Id.desc }
-    } yield (c)
+      val getartefacttags = for {
+        c <- artefact_tags.sortBy { x => x.artefact_Tag_Id.desc }
+      } yield (c)
 
 
-    //Json.arr() :+(getartefacttags)
-    db.run(getartefacttags.result).map { res => {
-      Ok(Json.arr() :+ (Json.toJson(res)))
-    }
-    }
+      //Json.arr() :+(getartefacttags)
+      db.run(getartefacttags.result).map { res => {
+        Ok(Json.arr() :+ (Json.toJson(res)))
+      }
+      }
 
 
   }
 
   def postArtefactTag = SecuredAction.async(parse.json) { implicit request =>
 
-  // for debugging 500 error
+    // for debugging 500 error
 
     Logger.info(request.body.toString)
     //Thread.sleep(2000)
@@ -347,16 +346,180 @@ class Api @Inject() (cache: CacheApi)
     //Thread.sleep(200)
 
 
-      db.run((artefact_tags += b).asTry).map(res =>
-        res match {
-          case Success(res) => Ok(Json.toJson(b))
-          case Failure(e) => {
-            Logger.error(s"Problem on insert, ${e.getMessage}")
-            InternalServerError(s"Problem on insert, ${e.getMessage}")
-          }
+    db.run((artefact_tags += b).asTry).map(res =>
+      res match {
+        case Success(res) => Ok(Json.toJson(b))
+        case Failure(e) => {
+          Logger.error(s"Problem on insert, ${e.getMessage}")
+          InternalServerError(s"Problem on insert, ${e.getMessage}")
         }
+      }
+    )
+    //Future.successful(Ok("added"))
+  }
+
+
+  def interaction = SecuredAction.async(parse.json) {
+    implicit request =>
+
+
+      val interactionBody = request.body.as[Interaction]
+      val newInteraction = Interaction(
+        interactionBody.artefact_id,
+        request.user.id,
+        interactionBody.interaction_type,
+        new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
       )
-      //Future.successful(Ok("added"))
-    }
+
+      val query = interactions += newInteraction
+
+      db.run((interactions += newInteraction).asTry).map(res =>
+        res match {
+          case Success(res) => Ok("Interaction recorded");
+          case Failure(res) => BadRequest(s"Writing artefact $res failed");
+        })
+
+  }
+
+  def message = SecuredAction.async(parse.json) {
+
+    implicit request =>
+
+      Logger.info(request.body.toString())
+
+      val message = request.body.as[Message]
+
+      val newMessage = Message(
+        message_id = 0,
+        message_type = message.message_type,
+        from_user = request.user.id,
+        to_user = message.to_user,
+        artefact_id = message.artefact_id,
+        message = message.message,
+        timestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
+      )
+
+      val query = messages += newMessage
+
+      db.run(
+        query.asTry
+          .map(res =>
+            res match {
+              case Success(res) => Ok("Message recorded");
+              case Failure(res) => BadRequest(s"Sending message $res failed");
+            }
+          )
+      )
+
+
+  }
+
+
+  def addGroup() = SecuredAction.async(parse.json) {
+    implicit request =>
+
+
+      implicit val jsonReadWriteFormatTrait = Json.format[Group]
+
+      val groupBody = request.body.as[Group]
+      val newGroup = Group(
+        groupBody.id,
+        groupBody.group_name,
+        request.user.id,
+        // 1,
+        // "group1",
+        // 1,
+        new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
+      )
+
+      val query = groups += newGroup
+
+      db.run(query.asTry).map(res =>
+        res match {
+          case Success(res) => Ok("Group recorded");
+          case Failure(res) => BadRequest(s"Writing group $res failed");
+        })
+
+  }
+
+
+  def getGroups() = SecuredAction.async {
+
+    implicit request =>
+
+
+      val getGroups = for {
+        c <- groups.sortBy { x => x.id.desc }
+      } yield (c)
+
+
+      //Json.arr() :+(getartefacttags)
+      db.run(getGroups.result).map { res => {
+
+
+
+
+
+        //def convertGroupsToJsonOrig(groups: Seq[Group]): JsValue = {
+        //  Json.toJson(
+        //    groups.map { t => Map("id" -> t.id, "name" -> t.group_name)}
+        //  )
+        //}
+
+        // val str = res.map { t => "\"id\": \""+t.id+"\", \"name\": \""+t.group_name+"\""}
+        //  val returnval = "{" + str.toString()
+        //Ok(str.toString())
+
+        Ok(Json.toJson(res))
+
+
+        // val mappedGroups = (
+        //   res.map(a => "id" -> a.id, "name" -> a.group_name).toMap());
+        //
+        //val mappedGroups = res.map (a => (("\"id\":" + a.id.toString), ("name\":" + "\"" + a.group_name)))
+        //Ok(Json.arr() :+ (Json.toJson(res)))
+        //Ok(scala.util.parsing.json.JSONObject(mappedGroups).toString())
+      }
+      }
+
+
+  }
+
+
+  def postRecommendation() = SecuredAction.async(parse.json) {
+    implicit request =>
+
+      val recBody = request.body.as[Recommendation]
+
+
+      // (id: Int,
+      //     recommended_by: Int,
+      //     recommended_for: Int,
+      //     recommendation_score: Double,
+      //     recommended_timestamp: Timestamp)
+
+
+
+      val newRec = Recommendation(
+        recBody.id,
+        recBody.artefact_id,
+        request.user.id,
+        recBody.recommended_for,
+        recBody.recommendation_score,
+        new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
+      )
+
+      Logger.info(newRec.recommended_for.toString);
+
+      val query = recommendations += newRec
+
+      db.run(query.asTry).map(res =>
+        res match {
+          case Success(res) => Ok("Recommendation recorded");
+          case Failure(res) => BadRequest(s"Writing recommendation $res failed");
+        })
+
+  }
+
 
 }

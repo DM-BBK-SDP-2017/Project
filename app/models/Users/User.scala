@@ -1,6 +1,4 @@
-package models
-
-import play.api.Logger
+package models.Users
 
 case class User( id:Int,
                  user:String,

@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.feed
+GET     /                           controllers.Application.index
 
 # Map static resources from the /public folder to the /assets URL path
 
@@ -28,6 +28,21 @@ GET     /api/artefacttagsforfeed              controllers.Api.getArtefactTagsFor
 POST    /api/artefacttag             controllers.Api.postArtefactTag
 
 GET     /api/artefacts/*idInt     controllers.Api.getArtefactById(idInt)
+
+POST    /feed/interaction           controllers.Api.interaction
+
+POST    /api/recommendation         controllers.Api.postRecommendation
+
+POST    /feed/message           controllers.Api.message
+
+GET     /api/groups             controllers.Api.getGroups
+
+POST    /api/group             controllers.Api.addGroup
+
+GET     /admin                  controllers.Application.admin
+
+
+
 
 POST  /login						controllers.Application.login
 
