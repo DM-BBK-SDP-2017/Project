@@ -20,7 +20,10 @@ import models.Blog.timestampFormat
 import play.api.cache._
 import javax.inject.Inject
 
-import models.Interactions.{Interaction, Message, Recommendation}
+import models.Artefacts.Category
+import models.Artefacts.Category.innerObj.categories
+import models.Intelligence.IntelWeightings
+import models.Interactions.{Comment, Interaction, Message, Recommendation}
 import models.Users.Group
 
 import scala.util.Try
@@ -36,7 +39,7 @@ class Api @Inject() (cache: CacheApi)
 
   extends Controller
   with AllTables
-    with HasDatabaseConfig[JdbcProfile] {
+      with HasDatabaseConfig[JdbcProfile] {
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
@@ -152,6 +155,8 @@ class Api @Inject() (cache: CacheApi)
     //
 
 
+
+
     val b = Artefact(
       id = 0,
       content = artefact.content,
@@ -160,7 +165,13 @@ class Api @Inject() (cache: CacheApi)
       //tags_ids_string = (for (a <- artefact.tags_ids_string.split(',')) yield {artefactTag_Results.get.filter(x => x.artefact_Tag_Id === a).artefact_Tag_Id}).mkString(","),
       // DOESN'T ALWAYS STORE TAGS tags_ids_string = artefact.tags_ids_string.split(",").map(x => results.get(x)).mkString(","),
       tags_ids_string = artefact.tags_ids_string,
+      category_id = artefact.category_id,
       created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
+
+
+    IntelligenceHelper.addIntelligence(b,IntelWeightings.FROM_NEW_ARTEFACT)
+
+
 
     db.run((artefacts += b).asTry).map(res =>
       res match {
@@ -189,6 +200,7 @@ class Api @Inject() (cache: CacheApi)
 
 
           }
+          IntelligenceHelper.generateArtefactValidation(b)
           Ok(Json.toJson(b))
 
         }
@@ -210,10 +222,10 @@ class Api @Inject() (cache: CacheApi)
     //val existingArtefactContent = (for { c <- artefacts if c.id === artefact.id } yield (c.content, c.tags_ids_string).update((artefact.content, artefact.tags_ids_string))
 
     //val existingArtefactContent = for { c <- artefacts if c.id === artefact.id } yield (c.content)
-    val existingArtefactContent = artefacts.filter(_.id === artefact.id).map(c => (c.content, c.tags_ids_string))
+    val existingArtefactContent = artefacts.filter(_.id === artefact.id).map(c => (c.content, c.tags_ids_string, c.category_id))
     Logger.info(existingArtefactContent.updateStatement.toString)
 
-    db.run((existingArtefactContent.update((artefact.content, artefact.tags_ids_string)).asTry).map(res => res match {
+    db.run((existingArtefactContent.update((artefact.content, artefact.tags_ids_string, artefact.category_id)).asTry).map(res => res match {
       case Success(res) => {
         Logger.info(res.value.toString)
 
@@ -419,7 +431,7 @@ class Api @Inject() (cache: CacheApi)
     implicit request =>
 
 
-      implicit val jsonReadWriteFormatTrait = Json.format[Group]
+
 
       val groupBody = request.body.as[Group]
       val newGroup = Group(
@@ -432,6 +444,9 @@ class Api @Inject() (cache: CacheApi)
         new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
       )
 
+      // Writes Group as a normal value
+
+      implicit val jsonReadWriteFormatTrait = Json.format[Group]
       val query = groups += newGroup
 
       db.run(query.asTry).map(res =>
@@ -521,5 +536,150 @@ class Api @Inject() (cache: CacheApi)
 
   }
 
+  def postComment() = SecuredAction.async(parse.json) {
+    implicit request =>
 
+      val commentBody = request.body.as[Comment]
+
+  //     comment_id: Int,
+  //   from_user: Int,
+  //   artefact_id: Int,
+  //   comment_content: String,
+  //   comment_timestamp: Timestamp
+
+      val newComment = Comment(
+        commentBody.comment_id,
+        request.user.id,
+        commentBody.artefact_id,
+        commentBody.comment_content,
+        new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
+      )
+
+      Logger.info(newComment.comment_content.toString);
+
+      val query = comments += newComment
+
+      db.run(query.asTry).map(res =>
+        res match {
+          case Success(res) => Ok("Comment recorded");
+          case Failure(res) => BadRequest(s"Writing comment $res failed");
+        })
+
+  }
+
+  def updateCategories = SecuredAction.async(parse.json) { implicit request =>
+
+    val future = scala.concurrent.Future {
+
+      val children = request.body \\ "id"
+
+      //Logger.info("children " + children.size.toString)
+
+
+      //]}]}5:"di"{,}4:"di"{[:"nerdlihc",3:"di"{,}2:"di"{,}1:"di"{[
+
+      val pattern = """nerdlihc",[0-9]+""".r
+
+      // val pattern(a, b) = pattern
+
+      val str = request.body.toString()
+      Logger.info("finallmatch " + List(pattern.findAllMatchIn(str)) )
+      Logger.info(pattern.findAllMatchIn(str).size.toString)
+
+
+
+      for (c <- children if (c.as[Int] != 0)) {
+
+        val id = c.as[Int]
+
+        // Logger.info("STRING " + str)
+        Logger.info("id " + (for {cat <- categories if cat.category_id === id} yield cat.parent).toString)
+        // Logger.info("index " + ("\"id\":" + id))
+        // Logger.info("STRING SLICE" + str.slice(0, str.indexOf("\"id\":" + id)))
+        // Logger.info("STRING SLICE REVERSE" + str.slice(0, str.indexOf("\"id\":" + id)).reverse)//.slice(14, 14 + id.toString.length + 1))
+        // Logger.info("MATCH" + pattern.findFirstIn(str.slice(0, str.indexOf("\"id\":" + id)).reverse))
+        // Logger.info("Int " + pattern.findFirstIn(str.slice(0, str.indexOf("\"id\":" + id)).reverse).get.slice(10, 10 + id.toString.length).reverse.toInt )
+
+
+        val parentId: Int = pattern.findFirstIn(str.slice(0, str.indexOf("\"id\":" + id)).reverse).get.slice(10, 10 + id.toString.length).reverse.toInt
+        val q = for {cat <- categories if cat.category_id === id} yield cat.parent
+        val updateAction = q.update(parentId)
+        //Logger.info(db.run(updateAction).toString)
+
+        db.run(updateAction.asTry).map(res =>
+          res match {
+            case Success(res) => Logger.info(s"Category: $res records updated");
+            case Failure(res) => Logger.info(s"Writing categories: $res records failed");
+          })
+      }
+
+
+      //NEED TO UPDATE ALL PARENTS TO -1
+
+    //  pattern.findAllMatchIn(str).size match {
+    //    case 0 => {
+//
+    //        val q = for {cat <- categories} yield cat.parent
+    //        val updateAction = q.update(-1)
+    //        db.run(updateAction.asTry).map(res =>
+    //        res match {
+    //          case Success(res) => Logger.info(s"Category $res updated");
+    //          case Failure(res) => Logger.info(s"Writing category $res failed");
+    //        })
+    //      }
+    //    case _ => {
+//
+    //
+    //  }
+//
+      //categoryresults
+
+   //  }
+
+   }
+
+    future.map(i => Ok("Written"))
+
+
+// Category.innerObj.updateCategories(request.body)
+
+
+//   (res =>
+// res match {
+//   case Success(res) => Ok("res");
+//   case Failure(res) => BadRequest(s"Writing categories failed");
+
+
+// })
+
+
+
+  }
+
+  def getCategories() = SecuredAction { implicit request =>
+
+          Ok(Category.innerObj.getCategoryPathsForNewArtefact())
+  }
+
+  def addCategory() = SecuredAction.async(parse.json) { implicit request =>
+
+    implicit val jsonReadWriteFormatTrait = Json.format[Category]
+    val category = request.body.as[Category]
+    val newCategory = Category(
+      0,
+      category.category_name,
+      category.parent
+    )
+
+    //Logger.info(newComment.comment_content.toString);
+
+    val query = categories += newCategory
+
+    db.run(query.asTry).map(res =>
+      res match {
+        case Success(res) => Ok(s"Category $res recorded");
+        case Failure(res) => BadRequest(s"Writing category $res failed");
+      })
+
+  }
 }

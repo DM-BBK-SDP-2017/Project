@@ -33,13 +33,22 @@ POST    /feed/interaction           controllers.Api.interaction
 
 POST    /api/recommendation         controllers.Api.postRecommendation
 
+POST    /api/comment                controllers.Api.postComment
+
 POST    /feed/message           controllers.Api.message
 
 GET     /api/groups             controllers.Api.getGroups
 
 POST    /api/group             controllers.Api.addGroup
 
-GET     /admin                  controllers.Application.admin
+PUT    /api/categories              controllers.Api.updateCategories
+
+GET     /api/categories              controllers.Api.getCategories
+
+POST    /api/categories              controllers.Api.addCategory
+
+
+GET     /admin            controllers.Application.admin
 
 
 

@@ -25,6 +25,11 @@ libraryDependencies ++= Seq(
 )
 
 
+fork in run := false
+
+PlayKeys.fileWatchService := play.runsupport.FileWatchService.sbt(pollInterval.value)
+
+
 //libraryDependencies += evolutions
 
 

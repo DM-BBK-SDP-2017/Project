@@ -1,21 +1,308 @@
 @import models.Interactions.Interaction
 @import models.Users.User
+@import models.Artefacts.Category
+
+@import org.joda.time.JodaTimePermission
+@import java.util.Calendar
 @(
         loginForm:play.api.data.Form[User],
-        user:String
+        user:String,
+        cats: Seq[Category]
+
 
 )(implicit messages: Messages)
 
 @main( play.Play.application().configuration().getString("application.name") , loginForm ,user) {
 
-    <script src='@routes.Assets.at("javascripts/AdminJsHelper.js")' type="text/javascript"></script>
+    @if(user != null) {
 
-    <script>
-            addGroup("group1");
-            addGroup("group2");
-            addGroup("group3");
-    addGroup("group4");
-    </script>
+        <script src='@routes.Assets.at("javascripts/AdminJsHelper.js")' type="text/javascript"></script>
+        <script src='@routes.Assets.at("javascripts/nestable/jquery.nestable.js")' type="text/javascript"></script>
+        <link rel="stylesheet" type="text/css" media="screen" href='@routes.Assets.at("stylesheets/nestable.css")'>
+        <script src='@routes.Assets.at("javascripts/magicsuggest/magicsuggest-min.js")' type="text/javascript"></script>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/magicsuggest-min.css")">
 
 
+
+        <script>
+                //addGroup("group1");
+                //addGroup("group2");
+                //addGroup("group3");
+                //addGroup("group4");
+                //addComment("1","comment");
+                //addComment("1","comment2");
+
+
+
+        </script>
+
+
+        <div class="well">
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2>Category Editor</h2>
+
+                </div>
+
+
+                <div class="panel-body">
+                    <div class="col-md-2 pull-right">
+                        <button type="button" class="btn btn-primary" id="NewCategory">New Category</button>
+                    </div>
+
+
+                    <div class="dd">
+                        <ol class="dd-list" id="ddCategory-1">
+
+                            @* @for(c <- CategoryInverted.CategoriesInverse(categories)) {/@
+
+                            <!--li class="dd-item" data-id="@c.category.category_id">
+                            <div class="dd-handle">@c.category.category_name</div>
+                            <ol class="dd-list"-->*@
+
+                            @{
+
+
+
+
+                                new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
+
+                                def showCat(recCat: Category): String = {
+                                    "<span id=\"ddCategory"+recCat.category_id+"\"></span>" +
+                                            "<li class=\"dd-item\" data-id=\"" + recCat.category_id + "\">" +
+                                            "<div id=\"dd-handle"+recCat.category_id+"\"class=\"dd-handle\">" + recCat.category_name + "</div>" +
+                                            //"<div id=\"dd-handle"+recCat.category_id+"\"class=\"dd-handle\">" + recCat.category_name + "<button class=\"editable\" id=\"catEditClickable" + recCat.category_id + "\">edit</button>" + "</div>" +
+                                            //"<div id=\"catEditClickable" + recCat.category_id + "\"><div id=\"dd-handle"+recCat.category_id+"\"class=\"dd-handle\">" + recCat.category_name + "</div>" + "</div>" +
+                                            (Category.innerObj.getChildren(recCat).isEmpty match {
+                                                case true => ""
+                                                case false => {
+                                                    "<ol class=\"dd-list\">" +
+                                                            (for(catInvert <- Category.innerObj.getChildren(recCat)) yield {
+                                                                //Html(catInvert.category_name)
+                                                                showCat(catInvert)
+                                                            }).mkString +
+                                                            "</ol>"
+                                                }
+
+                                            }) +
+                                            "</li>\n"
+
+                                }
+
+
+
+
+
+                                //val cat = Category(0,"Top Level",0)
+                                Html(showCat(cats(0)))
+                                //Utils.logPrinter(showCat(topcat))
+
+                            }
+
+
+
+
+                        </ol>
+                    </div>
+
+                </div>
+                <div id="footer" class="panel-footer">
+
+                    <button type="button" class="btn btn-primary" id="categoryEditSaveButton">Save</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div  class="modal fade" id="category" role="dialog">
+            <div class="modal-dialog" id="category-modal-dialogue" >
+
+                    <!-- Modal content-->
+                <div class="modal-content" id="category-modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Title</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <label class="categorylabel">Category Name</label>
+                        <input class="form-control input-lg" id="newCategoryName" type="text">
+                        <br>
+                        <label class="categoryChooser">Choose Parent Category</label>
+                        <input class="form-control input-lg" type="text" id="categoryChooser"/>
+                        <br>
+
+                        <div id="submit_close_buttons">
+                            <button id = "" name="submission_button" class="btn btn-primary" data-dismiss="modal" onClick="addCategory()" type="button">Submit</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" onClick="window.location.reload()">Close</button>
+                        </div>
+
+                    </div> <!--end of modal-->
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORY EDIT MODEL -->
+
+
+        <div  class="modal fade" id="categoryEdit" role="dialog">
+            <div class="modal-dialog" id="categoryEdit-modal-dialogue" >
+
+                    <!-- Modal content-->
+        <div class="modal-content" id="categoryEdit-modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Title</h4>
+            </div>
+            <div class="modal-body">
+
+                <label class="categoryEditlabel">Category Name</label>
+                <input class="form-control input-lg" id="editCategoryName" type="text">
+                <br>
+                <label class="categoryEditChooser">Choose Parent Category</label>
+                <input class="form-control input-lg" type="text" id="editCategoryChooser"/>
+                <br>
+
+                <div id="submit_close_buttons">
+                    <button id = "" name="submission_button" class="btn btn-primary" data-dismiss="modal" onClick="addCategory()" type="button">Submit</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onClick="window.location.reload()">Close</button>
+                </div>
+
+            </div>
+        </div>
+        </div>
+        </div>
+
+            <!--end of modal-->
+
+        <script>
+
+                var categories;
+                var categoriesMS;
+
+                $('#NewCategory').click(
+                        function() {
+                            $('#category').modal('show');
+                            categories = $.getJSON("api/categories").success(function categoriesMagicSuggest(cats) {
+                                categoriesMS = $('#categoryChooser').magicSuggest({
+                                    allowFreeEntries: false,
+                                    placeholder: 'Begin typing to search for categories',
+                                    maxSelection: 1,
+                                    data: cats
+
+
+
+                                })});
+                        }
+                );
+
+
+
+                $( document ).ready(function() {
+
+                    console.log("HERE");
+
+                    $('.dd').nestable({
+                        expandBtnHTML   : '<button data-action="expand" type="button" aria-label="Expand" title="Expand">+</button>',
+                        collapseBtnHTML : '<button data-action="collapse" type="button" aria-label="Collapse" title="Collapse">&minus;</button>',
+                        noDragClass     : 'dd-nodrag'
+                    });
+
+
+
+                    //$('#dd-handle0').attr('class', 'dd-nodrag');
+
+
+                });
+
+                /*Validate changes to hierarchy*/
+
+                $('.dd').on('SHOULDBEchange', function() {
+                    console.log(JSON.stringify($('.dd').nestable('serialize')));
+                    $('#warning').remove();
+
+                    console.log((JSON.stringify($('.dd').nestable('serialize')).slice(7,9)));
+
+                    if (JSON.stringify($('.dd').nestable('serialize')).slice(7,9) === "0,") {
+
+                        $('#warning').remove();
+                        $('#categoryEditSaveButton').show();
+
+
+                    } else {
+
+                        $('#categoryEditSaveButton').hide();
+                        $('#footer').append(
+                                '<div id="warning" class="alert alert-danger">' +
+                                '<strong>Error!</strong> Global category must be the top level category' +
+                                '</div>'
+                        )
+                    }
+                });
+
+              //  /*New category behaviour*/
+//
+              //  $('#ddCategory-1').click(function () {
+//
+              //      $('.dd').prepend(
+//
+              //      '<ol class="dd-list">' +
+              //      '<span id="ddCategory-1"></span>' +
+              //      '<li class="dd-item" data-id="-1">' +
+              //      '<div id="dd-handle-1" class="dd-handle">' + 'New Category' + '</div>' +
+              //      '</li>'
+//
+              //      )
+              //      updateCategories(categories);
+//
+              //  });
+
+                /*Save button*/
+
+                $('#categoryEditSaveButton').click(function () {
+                    var categories = JSON.stringify($('.dd').nestable('serialize'));
+                    console.log(categories)
+                    updateCategories(categories);
+
+                });
+
+
+                /*Bind edit buttons */
+
+                @for(c <- cats) {
+                    $('#catEditClickable@c.category_id').on(
+                    'click',
+                    function() {
+                        editCategory(@c.category_id)})
+                 }
+
+
+
+
+        </script>
+
+            <!--div class="dd2">
+        <ol class="dd-list">
+            <li class="dd-item" data-id="1">
+                <div class="dd-handle">Item 1</div>
+            </li>
+            <li class="dd-item" data-id="2">
+                <div class="dd-handle">Item 2</div>
+            </li>
+            <li class="dd-item" data-id="3">
+                <div class="dd-handle">Item 3</div>
+                <ol class="dd-list">
+                    <li class="dd-item" data-id="4">
+                        <div class="dd-handle">Item 4</div>
+                    </li>
+                    <li class="dd-item" data-id="5">
+                        <div class="dd-handle">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi convallis vel dolor sit amet viverra. Donec rhoncus, felis a vulputate convallis, mauris odio dictum sapien, non euismod velit nisl sed risus.</div>
+                    </li>
+                </ol>
+            </li>
+        </ol>
+    </div-->
+
+    }
 }

@@ -8,7 +8,7 @@ import play.api.libs.json.Json
   * Created by dannymadell on 20/07/2017.
   */
 case class FeedPost
-  (id: Int,
+  ( id: Int,
     post_type:String,
     artefact_id: Int)
 

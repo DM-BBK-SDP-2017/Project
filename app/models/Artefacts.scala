@@ -12,21 +12,10 @@ case class Artefact(id: Int,
                     content:String,
                     creator: Int,
                     tags_ids_string: String,
+                    category_id: Int,
                     created: Timestamp)
 
-object Artefact extends ((Int, String, Int, String, Timestamp) => Artefact) {
-
-  implicit object timestampFormat extends Format[Timestamp] {
-    val format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-    val printFormat = new SimpleDateFormat("HH:mm:ss")
-
-    def reads(json: JsValue) = {
-      val str = json.as[String]
-      JsSuccess(new Timestamp(format.parse(str).getTime))
-    }
-
-    def writes(ts: Timestamp) = JsString(printFormat.format(ts))
-  }
+object Artefact extends ((Int, String, Int, String, Int,Timestamp) => Artefact) with TimeStampFormat {
 
   implicit val jsonReadWriteFormatTrait = Json.format[Artefact]
 }

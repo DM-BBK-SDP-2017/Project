@@ -9,7 +9,6 @@ import play.api.data.Forms._
 import play.api.data.format.Formats._
 import models.{Blog, Users}
 import models.Users.User
-
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
 import play.api.db.slick.HasDatabaseConfig
@@ -40,6 +39,8 @@ import models.Blog.timestampFormat
 import play.api.cache._
 import javax.inject.Inject
 
+import models.Artefacts.Category
+import models.Artefacts.Category._
 import models.Interactions.Interaction
 import models.Users.User
 
@@ -58,7 +59,7 @@ class Application @Inject() (cache: CacheApi)
     with AllTables
     with HasDatabaseConfig[JdbcProfile] {
 
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
+    val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
   import driver.api._
 
   //val users = TableQuery[Users]
@@ -130,32 +131,45 @@ class Application @Inject() (cache: CacheApi)
 
           val returnResults = Await.result(db.run(getartefacts.result), Duration.Inf)
 
+          val getComments = for {
+            c <- comments.sortBy {x => x.comment_id.asc }
+          } yield (c)
 
-          Ok(views.html.feed(returnResults, loginForm, auth.get.user, Forms.interactionForm))
+          val returnComments = Await.result(db.run(getComments.result), Duration.Inf)
+
+
+          Ok(views.html.feed(returnComments, returnResults, loginForm, auth.get.user, Forms.interactionForm))
         } else
-          Ok(views.html.feed(null, loginForm, null, null))
+          Ok(views.html.feed(null, null, loginForm, null, null))
       }.getOrElse{
-        Ok(views.html.feed(null, loginForm, null, null))
+        Ok(views.html.feed(null, null, loginForm, null, null))
       }
 
   }
 
   def admin = Action { implicit request =>
 
+    Category.innerObj.getCategoryPathsForNewArtefact
+
     request.session.get("user").map { u =>
 
       val auth = cache.get[User](u)
 
 
+      val allCategoriesQuery = for {
+        c <- categories.sortBy { x => x.category_id }
+      } yield (c)
 
+      val categoryResults: Seq[Category] = Await.result(db.run(allCategoriesQuery.result), Duration.Inf)
+      Logger.info("SIZE " + categoryResults.size)
 
 
       if ( ! auth.isEmpty )
-        Ok(views.html.admin(loginForm, auth.get.user))
+        Ok(views.html.admin(loginForm, auth.get.user, categoryResults))
       else
-        Ok(views.html.admin(loginForm, null))
+        Ok(views.html.admin(loginForm, null, null))
     }.getOrElse{
-      Ok(views.html.admin(loginForm, null))
+      Ok(views.html.admin(loginForm, null, null))
     }
   }
 
@@ -198,6 +212,8 @@ class Application @Inject() (cache: CacheApi)
 
       Redirect(routes.Application.feed()).withSession(
           "user" -> id)
+
+
 
   }
 

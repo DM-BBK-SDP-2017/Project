@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.Calendar
 
 import models.TimeStampFormat
+import play.api.Logger
 import play.api.libs.json._
 import slick.driver.JdbcProfile
 
@@ -35,8 +36,12 @@ object Group extends ((Int, String, Int, Timestamp) => Group) with TimeStampForm
       }
 
       def reads(json: JsValue): JsResult[Group] = {
-        val str = json.as[String]
-        JsSuccess(Group(0,(json \ "name").get.toString(),0,new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))
+
+
+        Logger.info(json.toString())
+
+        //val str = json.as[Group]
+        JsSuccess(Group(0,(json \ "group_name").get.toString(),0,new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))
       }
 
 

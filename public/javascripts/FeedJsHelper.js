@@ -41,7 +41,7 @@ function messageSender(artefact_id, message_type, message, to_user) {
         error : function(response) {
             alert("error " + response.statusText + ":"+ response.status+" - " +response.responseText)
         }
-    })
+    });
 }
 
 function like(int) {
@@ -188,6 +188,57 @@ function prepareRecData(artefact_id) {
     });
 
     //console.log('data tags size ' + ms.getData().length);
+}
+
+function addComment(artefact_id) {
+
+//    comment_id: Int,
+//        from_user: Int,
+//        artefact_id: Int,
+//        comment_content: String,
+//        comment_timestamp: Timestamp
+
+    var content = $('#addComment_content_'+artefact_id).val();
+    console.log("Posting comment for artefact_id_"+artefact_id);
+
+    var json = JSON.stringify({ "comment_id": 0, "from_user": 0, "artefact_id": artefact_id, "comment_content": content, "comment_timestamp": "1971-01-01T00:00:00.000"});
+
+    $.ajax({
+        type : "POST",
+        contentType : "application/json; charset=utf-8",
+        data : json,
+        url : "/api/comment",
+        success : function(data) {
+            console.log(data);
+
+        },
+        error : function(response) {
+            alert("error " + response.statusText + ":"+ response.status+" - " +response.responseText)
+        }
+    });
+
+
+
+
+
+
+    //messageSender(artefact_id,"alert",content,1);
+
+    var button = '#addComment_button_' + artefact_id.toString();
+    $('#addComment_slidedown_'+ artefact_id.toString()).fadeOut("slow");
+
+    $(button).fadeOut('slow', function() {
+
+        var div = $('<button class="btn btn-default btn-info"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true" ></span> Thanks for your comment, it will appear when you reload this artefact</button>');
+        $(this).replaceWith(div);
+        $(button).fadeIn("slow");
+
+    });
+
+
+
+
+
 }
 
 
