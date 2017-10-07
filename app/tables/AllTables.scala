@@ -1,6 +1,7 @@
 package tables
 
 import models.Artefacts.CategoryTable
+import models.Intelligence.answerToQuestion.{answerToQuestion, answerToQuestionInteractionTable, answerToQuestionTable}
 import models.Intelligence.{ArtefactValidation, ArtefactValidationTable, IntelligenceTable}
 import models.Interactions.{CommentTable, MessageTable, RecommendationTable}
 import models.Users.{GroupTable, UserGroupTable}
@@ -25,6 +26,8 @@ with RecommendationTable
   with ArtefactValidationTable
   with IntelligenceTable
   with CategoryTable
+  with answerToQuestionTable
+  with answerToQuestionInteractionTable
 {
 
   val users = TableQuery[Users]
@@ -38,5 +41,7 @@ with RecommendationTable
   val artefactValidations = TableQuery[ArtefactValidations]
   val intelligences = TableQuery[Intelligences]
   val categories = TableQuery[Categories]
+  val answerToQuestions = TableQuery[answerToQuestions]
+  val answerToQuestionInteractions = TableQuery[answerToQuestionInteractions]
 
 }

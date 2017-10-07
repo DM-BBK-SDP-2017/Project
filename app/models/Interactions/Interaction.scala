@@ -3,7 +3,7 @@ package models.Interactions
   import java.sql.Timestamp
   import java.text.SimpleDateFormat
 
-  import models.TimeStampFormat
+  import models.Utils.TimeStampFormat
   import play.api.libs.json._
 
 case class Interaction (

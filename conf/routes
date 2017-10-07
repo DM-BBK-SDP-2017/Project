@@ -41,6 +41,8 @@ GET     /api/groups             controllers.Api.getGroups
 
 POST    /api/group             controllers.Api.addGroup
 
+GET     /api/users              controllers.Api.getUsers
+
 PUT    /api/categories              controllers.Api.updateCategories
 
 GET     /api/categories              controllers.Api.getCategories
@@ -51,6 +53,21 @@ POST    /api/categories              controllers.Api.addCategory
 GET     /admin            controllers.Application.admin
 
 
+# Feed Additional Action Forms
+
+POST    /api/answerToQuestion          controllers.Feed_Api.answerToQuestionResponse
+
+POST    /api/somethingIKnowAbout          controllers.Feed_Api.somethingIKnowAboutFormResponse
+
+POST    /api/somethingSomeoneElseKnowsAbout controllers.Feed_Api.somethingSomeoneElseKnowsAboutFormResponse
+
+POST    /api/suggestNewCategory          controllers.Feed_Api.suggestNewCategoryFormResponse
+
+
+
+
+
+# Logins
 
 
 POST  /login						controllers.Application.login

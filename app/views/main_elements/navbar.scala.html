@@ -1,0 +1,41 @@
+@import models.Users.User
+@(user: String, isFeed: Boolean)
+<nav class="navbar navbar-default" >
+
+    <div class="container-fluid" id="navbar-container">
+
+
+
+        @*<div class="navbar-header pull-left">
+        <a class="navbar-brand" href="/"> <img src="/assets/images/favicon.png" class="img-responsive" > </a>
+        </div>*@
+        <div>
+            <ul class="nav navbar-nav pull-right">
+                @*<li class="active"><a href="/">Home</a></li>*@
+                @if(user != null) {
+
+
+
+                    <li><a href="/logout">Logout</a></li>
+
+
+
+                } else {
+                    <li><a href="#login" data-toggle="modal" data-target="#login">Login</a></li>
+                }
+
+
+                </ul>
+        </div>
+
+        <div class="navbar-header">
+        @if(user != null) {
+            <p class="navbar-text" style="color: rgba(21,55,27,0.6)">hello @user
+            </p>
+        } else {
+            <p class="navbar-text" style="color: rgba(21,55,27,0.6) ;"><b>please sign in</b></p>
+        }
+        </div>
+
+    </div>
+</nav>

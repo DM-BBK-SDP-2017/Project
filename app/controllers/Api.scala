@@ -1,47 +1,28 @@
 package controllers
 
-import java.util.Date
-
-import scala.concurrent.{Await, Future}
 import models._
-import play.api.Play
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.db.slick.HasDatabaseConfig
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.Action
-import play.api.mvc.Controller
-import slick.driver.JdbcProfile
-import tables._
-import java.sql.Timestamp
+import play.api.libs.json._
 import java.util.Calendar
 
 import models.Blog.timestampFormat
-import play.api.cache._
-import javax.inject.Inject
-
 import models.Artefacts.Category
-import models.Artefacts.Category.innerObj.categories
 import models.Intelligence.IntelWeightings
 import models.Interactions.{Comment, Interaction, Message, Recommendation}
-import models.Users.Group
+import models.Users.{Group, User}
 
-import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
 import play.Logger
-import play.twirl.api.Html
-import slick.backend.DatabasePublisher
+import javax.inject.Inject
+
+import play.api.cache._
 
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
-class Api @Inject() (cache: CacheApi)
+class Api @Inject() (cache: CacheApi) extends controllers_all {
 
-  extends Controller
-  with AllTables
-      with HasDatabaseConfig[JdbcProfile] {
-
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
 
   import driver.api._
 
@@ -168,8 +149,15 @@ class Api @Inject() (cache: CacheApi)
       category_id = artefact.category_id,
       created = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()))
 
+    val user_id: Int =
+      request.session.get("user").map { u =>
+        val auth = cache.get[User](u)
+        auth.get.id
+      }.get
 
-    IntelligenceHelper.addIntelligence(b,IntelWeightings.FROM_NEW_ARTEFACT)
+
+
+    IntelligenceHelper.addIntelligence(b, FROM_NEW_ARTEFACT, user_id)
 
 
 
@@ -680,6 +668,45 @@ class Api @Inject() (cache: CacheApi)
         case Success(res) => Ok(s"Category $res recorded");
         case Failure(res) => BadRequest(s"Writing category $res failed");
       })
+
+  }
+
+
+
+  def getUsers() = SecuredAction { implicit request =>
+
+    implicit object customUserJsonFormatter extends Format[User] {
+
+      def writes(x: User): JsValue = {
+        Json.obj(
+          "id" -> JsNumber(x.id),
+          "name" -> JsString(x.nickname)
+
+        )
+      }
+
+      def reads(json: JsValue): JsResult[User] = {
+
+        val str = json.as[String]
+        //JsSuccess(Category(0,(json \ "name").get.toString(),0,new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())))
+
+        JsSuccess(User(0,"","",""))
+
+      }
+    }
+
+
+
+    val query = users.sortBy(user => user.nickname).result
+    val queryResult = Await.result(db.run(query.asTry).map { res =>
+
+      res match {
+        case Success(a) => Ok(Json.toJson(a))
+        case Failure(a) => BadRequest(s"$a")
+      }
+    }, Duration.Inf)
+
+    queryResult
 
   }
 }

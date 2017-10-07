@@ -2,7 +2,7 @@ package models.Interactions
 
 import java.sql.Timestamp
 
-import models.TimeStampFormat
+import models.Utils.TimeStampFormat
 import play.api.libs.json.Json
 import slick.driver.JdbcProfile
 

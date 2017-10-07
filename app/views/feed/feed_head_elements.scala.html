@@ -1,0 +1,20 @@
+@()
+<script src='@routes.Assets.at("javascripts/FeedJsHelper.js")' type="text/javascript"></script>
+<script src='@routes.Assets.at("javascripts/moment-with-locales.min.js")' type="text/javascript"></script>
+<script src='@routes.Assets.at("javascripts/magicsuggest/magicsuggest-min.js")' type="text/javascript"></script>
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/magicsuggest-min.css")">
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+
+
+
+<script>
+
+        var groups = [];
+        $.getJSON("api/groups").success(function(data) {
+
+            for (var i = 0; i < data.length; i++) {
+                groups.push(data[i]);
+            }
+        });
+
+</script>

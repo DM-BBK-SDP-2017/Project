@@ -1,5 +1,5 @@
 @import models.Users.User
-@(blogs:List[Blog],loginForm:   play.api.data.Form[User],user:String)(implicit messages: Messages)
+@(blogs:List[Blog],loginForm:   play.api.data.Form[User],user:String)(implicit flash: Flash)
 @import helper._
 	@import tables._
 @import play.i18n.Messages
@@ -125,4 +125,4 @@
 			}
 		);
 </script>
-}	
+}(flash)

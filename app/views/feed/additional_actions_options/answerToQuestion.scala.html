@@ -1,0 +1,69 @@
+
+@()
+
+<div  class="modal fade" id="answerToQuestion" role="dialog">
+    <div class="modal-dialog" id="answerToQuestion-modal-dialogue" >
+
+            <!-- Modal content-->
+        <div class="modal-content" id="answerToQuestion-modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Ask a question</h4>
+            </div>
+            <div class="modal-body" id="answerToQuestion_modal-body">
+
+
+                 @helper.form(action = routes.Feed_Api.answerToQuestionResponse()) {
+
+
+
+
+                     <input id="request_id" name="request_id" type="hidden" value="0">
+                     <input id="from_user" name="from_user" type="hidden" value="0">
+                     <input id="status" name="status" type="hidden" value="0">
+                     <input id="category" name="category" type="hidden" value="-1">
+
+
+
+                     <div class="input-group">
+                        <span class="input-group-addon" id="sizing-addon2">What question would you like answered?</span>
+                        <input id="question" name="question" autofocus type="text" class="form-control" placeholder="my question" aria-describedby="sizing-addon2">
+                    </div>
+
+                    <br>
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="sizing-addon2">What category is it in?</span>
+                        <div id="category_ms" type="text" class="form-control" aria-describedby="sizing-addon2"></div>
+
+                    </div>
+                    <br>
+
+
+                    <button id = "submitForm" class="btn btn-primary" type="submit">Submit</button>
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+                }
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+
+            $.getJSON("api/categories").success(function categoriesMagicSuggest(cats) {
+                var categoriesEditMS_category_ms = $('#category_ms').magicSuggest({
+                    allowFreeEntries: false,
+                    placeholder: 'Select a category',
+                    maxSelection: 1,
+                    data: cats
+                })
+
+                $(categoriesEditMS_category_ms).on('selectionchange', function(e, cb, s){
+                    $('#category').attr('value', this.getValue()[0])
+                });
+
+            });
+
+    </script>

@@ -3,7 +3,7 @@ package models.Users
 import java.sql.Timestamp
 import java.util.Calendar
 
-import models.TimeStampFormat
+import models.Utils.TimeStampFormat
 import play.api.Logger
 import play.api.libs.json._
 import slick.driver.JdbcProfile

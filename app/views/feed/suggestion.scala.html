@@ -1,0 +1,17 @@
+@(a: Artefact)
+<div class="collapse" id="suggest_slidedown_@a.id">
+    <br>
+
+    <div class="col-12">
+        <label>Suggest improvement or update</label>
+        <div class="input-group">
+
+            <input type="text" id="suggestion_content_@a.id" class="form-control" placeholder="Enter suggestion here">
+            <span class="input-group-btn">
+                <button class="btn btn-default" onclick="suggest(@a.id, @a.creator)" type="button">Go!</button>
+            </span>
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+
+
+</div>

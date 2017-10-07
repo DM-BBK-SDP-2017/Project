@@ -2,8 +2,9 @@ package controllers
 
 import java.sql.Timestamp
 import java.util.Calendar
-
-import models.Interactions.Interaction
+import models.Intelligence._
+import models.Interactions._
+import models.Intelligence.answerToQuestion.answerToQuestion
 import models.Users.User
 import play.api.Play
 import play.api.data.Form
@@ -39,6 +40,8 @@ object Forms extends InteractionTable  with HasDatabaseConfig[JdbcProfile]  {
         "interaction_type" -> text)
     ((artefact_id, user_id, interaction_type) => Interaction(artefact_id,user_id,interaction_type,new java.sql.Timestamp(Calendar.getInstance().getTime().getTime()) ))
     ((i: Interaction) => Some(i.artefact_id, i.user_id, i.interaction_type)))
+
+
 
 
 }

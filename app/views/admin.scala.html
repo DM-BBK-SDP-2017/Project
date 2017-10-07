@@ -10,7 +10,7 @@
         cats: Seq[Category]
 
 
-)(implicit messages: Messages)
+)(implicit flash: Flash)
 
 @main( play.Play.application().configuration().getString("application.name") , loginForm ,user) {
 
@@ -62,9 +62,6 @@
                             <ol class="dd-list"-->*@
 
                             @{
-
-
-
 
                                 new java.sql.Timestamp(Calendar.getInstance().getTime().getTime())
 
@@ -305,4 +302,4 @@
     </div-->
 
     }
-}
+}(flash)

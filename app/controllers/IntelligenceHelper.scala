@@ -9,6 +9,7 @@ import play.Logger
 import play.api.Play
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfig}
 import slick.driver.JdbcProfile
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import tables.AllTables
@@ -36,11 +37,11 @@ object IntelligenceHelper extends AllTables with HasDatabaseConfig[JdbcProfile] 
     //val user_validation = artefactValidations.filter(_.artefact_id == artefact.id)
   }
 
-  def addIntelligence(artefact: Artefact, weighting: Double) = {
+  def addIntelligence(artefact: Artefact, weighting: Double, user: Int) = {
 
    val newIntel = Intelligence(
         0,        // intel_id
-        -1,       // identified_by
+        user,       // identified_by
         "CREATED_ARTEFACT",       // identifier_how
         artefact.creator,       // user_id
       artefact.category_id,       // knows_about_category

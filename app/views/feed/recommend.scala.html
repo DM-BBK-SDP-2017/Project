@@ -1,0 +1,54 @@
+@(a: Artefact)
+
+<div class="collapse" id="recommend_slidedown_@a.id">
+    <br>
+    <div class="container">
+
+        <div class="row">
+            <label>Choose a group you would recommend this to</label>
+            <div class="input-group col-lg-6">
+
+                <input id="recommend_chooser_@a.id" class="form-control" placeholder="Start typing to begin searching"> </input>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" id="selection_submit_@a.id" type="button">Go!</button>
+                </span>
+
+                <script>
+
+
+
+
+
+                        $(document).ready(function() {
+                            $('#selection_submit_@a.id').bind('click', function() {
+                                recommend(@a.id, recommendations_@{a.id}.getValue());
+
+
+                            });
+
+
+                            var recommendations_@a.id
+
+                            //console.log(groups)
+
+                            recommendations_@a.id = $('#recommend_chooser_' +@a.id).magicSuggest({
+                                allowFreeEntries: false,
+                                placeholder: 'Begin typing to search for groups',
+                                maxSelection: 1,
+                                data: groups
+                            });
+
+
+
+
+                        });
+
+                </script>
+
+
+                    <!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+
+        </div>
+    </div>
+</div>

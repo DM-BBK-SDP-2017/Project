@@ -1,0 +1,84 @@
+@import models.Interactions.Comment
+@(a: Artefact,comments: Seq[Comment])
+<div class="collapse" id="comments_@a.id">
+
+    <br>
+
+    <div class="container">
+        <div class="row">
+
+            @if(comments.length == 0) {<p>No comments yet</p>}
+
+            @for(c <- comments.filter(_.artefact_id == a.id)) {
+
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="panel panel-white post panel-shadow">
+                        <div class="post-heading">
+                            <div class="pull-left image">
+                                <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar" alt="user profile image">
+                            </div>
+                            <div class="pull-left meta">
+                                <div class="title h5">
+                                    <a href="#"><b>@c.from_user</b></a>
+                                    made a post
+                                </div>
+                                <h6 id="commentDate_@c.comment_id" class="text-muted time">
+                                    <script>
+                                                            $('#commentDate_@c.comment_id').text(moment("@c.comment_timestamp", "YYYY-MM-DD HH:mm:ss.MMM").fromNow());
+                                                    </script>
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="post-description">
+                            <p>@c.comment_content</p>
+                                <!--div class="stats">
+                                                    <a href="#" class="btn btn-default stat-item">
+                                                        <i class="fa fa-thumbs-up icon"></i>2
+                                                    </a>
+                                                    <a href="#" class="btn btn-default stat-item">
+                                                        <i class="fa fa-thumbs-down icon"></i>12
+                                                    </a>
+                                                </div-->
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+
+
+        </div>
+    </div>
+    <br>
+
+        <!-- NEW COMMENT BOX HERE-->
+
+    <div>
+
+
+        <button type="button" class="btn btn-primary btn-default" id="addComment_button_@a.id" >
+            <a class="panel-toggle" data-parent="#commentParent_@a.id" data-toggle="collapse" href="#addComment_slidedown_@a.id"><span class="glyphicon glyphicon-star" aria-hidden="true"></span>New Comment</a>
+        </button>
+
+        <div class="collapse" id="addComment_slidedown_@a.id">
+            <br>
+
+            <div class="col-12">
+                <label>Add your comment beneath</label>
+                <div class="input-group">
+
+                    <input type="text" id="addComment_content_@a.id" class="form-control" placeholder="Enter comment here">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" onclick="addComment(@a.id)" type="button">Go!</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+
+
+        </div>
+
+
+    </div>
+
+
+</div>

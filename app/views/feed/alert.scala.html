@@ -1,0 +1,19 @@
+@(a: Artefact)
+<div class="collapse" id="alertAdmin_slidedown_@a.id">
+    <br>
+
+    <div class="col-12">
+        <label>Alert Administrator</label>
+        <br>
+        <em>Write why this content is not appropriate e.g. is the content defamatory, incorrect or otherwise inappropriate. Content will be suspended until administrator reviews your comment</em>
+        <br>
+        <div class="input-group">
+
+            <input type="text" id="alertAdmin_content_@a.id" class="form-control" placeholder="Enter reasons here">
+            <span class="input-group-btn">
+                <button class="btn btn-default" onclick="alertAdmin(@a.id)" type="button">Go!</button>
+            </span>
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+
+</div>

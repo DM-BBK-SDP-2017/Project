@@ -1,12 +1,9 @@
 package models
 
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import javax.swing.text.html.HTML
 
+import models.Utils.TimeStampFormat
 import play.api.libs.json._
-import slick.driver.JdbcProfile
-import slick.lifted.TableQuery
 
 case class Artefact(id: Int,
                     content:String,

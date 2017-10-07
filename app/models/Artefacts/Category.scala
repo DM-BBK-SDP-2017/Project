@@ -209,12 +209,12 @@ object Category extends ((Int,String,Int) => Category) {
       val arr = showCat(head, "")
 
 //
-      Logger.info(cats.size.toString)
-      for (c <- cats) {Logger.info("HERE22" + c.toString())}
+      //Logger.info(cats.size.toString)
+      //for (c <- cats) {Logger.info("HERE22" + c.toString())}
 //
 //
 
-      Logger.info(Json.toJson(cats.toMap).toString())
+      //Logger.info(Json.toJson(cats.toMap).toString())
      Json.toJson(cats.toMap)
 
 

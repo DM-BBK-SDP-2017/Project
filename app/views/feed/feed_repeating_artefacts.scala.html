@@ -1,0 +1,83 @@
+@import models.Artefact
+@import models.Interactions.Interaction
+@import models.Interactions.Comment
+@import models.Users.User
+
+@(comments: Seq[Comment],artefacts:Seq[Artefact])
+@for(a <- artefacts.slice(0,5)) {
+    <div class="panel panel-default" id="artefact_@a.id">
+        <div class="panel-body">
+
+        @Html(controllers.Utils.HTMLDecode(a.content))
+
+        </div>
+
+        <div class="panel-footer" id="dataParent_@a.id">
+
+            <div class="btn-group" id="likeButtons_@a.id">
+                <button class="btn btn-primary btn-default" onclick="like(@a.id)"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Useful</button>
+                <button class="btn btn-primary btn-default" onclick="dislike(@a.id)"><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span> Not Useful</button>
+            </div>
+            <div class="btn-group pull-right" id="moreAndCommentsButton_@a.id">
+                <div class="pull-right">
+
+
+                    <button type="button" class="btn btn-default btn-default pull-right">
+                        <a class="panel-toggle" data-parent="#dataParent_@a.id" onclick="more(@a.id)" id="more_button_@a.id" data-toggle="collapse" href="#more_@a.id"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> More</a>
+                    </button>
+                    <button type="button" class="btn btn-default btn-default pull-right">
+                        <a class="panel-toggle"  data-parent="#dataParent_@a.id"  onclick="more(@a.id)" id="comment_button_@a.id" data-toggle="collapse" href="#comments_@a.id"><span class="badge">@comments.filter(_.artefact_id == a.id).length</span> Comments</a>
+                    </button>
+                </div>
+            </div>
+
+
+
+
+            <div class="collapse" id="more_@a.id">
+
+                <br>
+
+                <div class="btn-group">
+                    <button class="btn btn-default" href="#suggest_slidedown_@a.id" data-toggle="collapse" id="suggest_@a.id"><span class="glyphicon glyphicon-education" aria-hidden="true" ></span> Suggest improvement or update</button>
+                    <button class="btn btn-default" href="#recommend_slidedown_@a.id" data-toggle="collapse" id="recommend_@a.id"><span class="glyphicon glyphicon-education" aria-hidden="true" ></span> Recommend to others</button>
+                    <button class="btn btn-default" href="#alertAdmin_slidedown_@a.id" data-toggle="collapse" id="alertAdmin_@a.id"><span class="glyphicon glyphicon-alert" aria-hidden="true" ></span> Flag to administrator</button>
+
+                </div>
+                    <!--/div-->
+
+                @**@
+                @*Suggestion Slidedown*@
+
+                @feed.suggestion(a)
+
+                @*End of Suggestion Slidedown*@
+
+                @*Recommend Slidedown*@
+
+
+                @feed.recommend(a)
+
+                @*End of Recommend Slidedown*@
+
+                @*Alert Slidedown*@
+
+                @feed.alert(a)
+
+                @*End of Alert Slidedown*@
+
+                @feed.comments(a, comments)
+
+
+            </div>
+
+
+
+
+
+
+
+        </div>
+    </div>
+
+}

@@ -15,8 +15,7 @@ libraryDependencies ++= Seq(
   ,"com.typesafe.play" %% "play-slick" % "1.1.0"
  //, "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
   ,"com.typesafe.play" %% "play-slick-evolutions" % "1.1.1",
-  "org.scalatestplus" %% "play" % "1.2.0" % "test"
-,
+  //"org.scalatestplus" %% "play" % "1.2.0" % "suggestion",
   "org.jsoup" % "jsoup" % "1.8.3"
 
 

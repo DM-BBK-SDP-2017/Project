@@ -1,0 +1,106 @@
+@()
+
+<div  class="modal fade" id="subjectSomeoneKnowsAbout" role="dialog">
+    <div class="modal-dialog" id="subjectSomeoneKnowsAbout-modal-dialogue" >
+
+            <!-- Modal content-->
+        <div class="modal-content" id="subjectSomeoneKnowsAbout-modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Who knows about something?</h4>
+            </div>
+            <div class="modal-body" id="subjectSomeoneKnowsAbout-body">
+
+
+
+                @helper.form(action = routes.Feed_Api.somethingSomeoneElseKnowsAboutFormResponse()) {
+
+
+
+                    <input id="intel_id" name="intel_id" type="hidden" value="0">
+                    <input id="identified_by" name="identified_by" type="hidden" value="0">
+                    <input id="identifier_how" name="identifier_how" type="hidden" value="0">
+                    <input id="user_id_2" name="user_id" type="hidden" >
+                    <input id="knowledge_strength" name="knowledge_strength" type="hidden" value="0">
+                    <input id="identified_timestamp" name="identified_timestamp" type="hidden" value="0">
+                    <input id="someone_else_knows_about_category" name="knows_about_category" type="hidden">
+
+
+
+                    <div class="input-group">
+                        <span class="input-group-addon" id="sizing-addon2">I think...</span>
+                        <div id="user_id_ms" type="text" class="form-control" aria-describedby="sizing-addon2"></div>
+                        <span class="input-group-addon" id="sizing-addon2">knows about...</span>
+                        <div id="someone_knows_about_category_ms" type="text" class="form-control" aria-describedby="sizing-addon2"></div>
+
+                    </div>
+
+                    <br>
+
+
+                    <button id = "submitForm" class="btn btn-primary" type="submit">Submit</button>
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+
+                }
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+        $.getJSON("api/categories").success(function categoriesMagicSuggest(cats) {
+            var categoriesEditMS_category_ms = $('#someone_knows_about_category_ms').magicSuggest({
+                allowFreeEntries: false,
+                placeholder: 'Select a category',
+                maxSelection: 1,
+                data: cats
+            })
+
+            $(categoriesEditMS_category_ms).on('selectionchange', function(e, cb, s){
+                $('#someone_else_knows_about_category').attr('value', this.getValue()[0])
+                console.log("KNOWS ABOUT: " + $('#someone_else_knows_about_category').val())
+            });
+
+        });
+
+
+        $.getJSON("api/users").success(function categoriesMagicSuggest(users) {
+            var users_ms = $('#user_id_ms').magicSuggest({
+                allowFreeEntries: false,
+                placeholder: 'Select a category',
+                maxSelection: 1,
+                data: users
+            })
+
+            $(users_ms).on('selectionchange', function(e, cb, s){
+                $('#user_id_2').attr('value', this.getValue()[0])
+                console.log("USER ID: " + $('#user_id').val())
+
+            });
+
+        });
+
+</script>
+
+
+
+
+@*
+
+case class Intelligence // determined by authoring an artefact, being validated or recommended as knowing
+(
+intel_id: Int,
+identified_by: Int,
+identifier_how: String, // e.g. request etc.
+user_id: Int, // user with knowledge
+someone_knows_about_category: Int,
+knowledge_strength: Double,// category
+identified_timestamp: Timestamp
+
+)
+*@
+

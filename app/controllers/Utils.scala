@@ -2,9 +2,10 @@ package controllers
 
 import java.util.Calendar
 
-import models.Users.Group
-import play.api.Logger
+import models.Users.{Group, User}
+import play.api.{Logger, cache}
 import play.api.libs.json._
+import play.api.mvc.{Request, Result}
 import play.libs.Json
 
 /**
@@ -31,7 +32,6 @@ object Utils {
   def logPrinter(str: String) = {
     Logger.info(str)
   }
-
 
 
 

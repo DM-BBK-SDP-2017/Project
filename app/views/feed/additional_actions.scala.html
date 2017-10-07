@@ -1,0 +1,62 @@
+@()
+
+
+
+
+<div class="dropdown">
+
+    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Actions
+        <span class="caret"></span></button>
+    <ul class="dropdown-menu .dropdown-menu-left">
+
+        <li class="dropdown-header">I would like...</li>
+        <li><a onclick="answerToQuestion()">An answer a question</a></li>
+        <li><a onclick="addArtefact()">To add an artefact myself</a></li>
+        <li><a onclick="suggestNewCategory()">To suggest a new knowledge category</a></li>
+
+        <li class="divider"></li>
+
+        <li class="dropdown-header">I know...</li>
+        <li><a onclick="subjectIKnowAbout()">About a certain subject</a></li>
+        <li><a onclick="subjectSomeoneKnowsAbout()">Somebody who knows about a particular subject</a></li>
+
+        <li class="divider"></li>
+
+        <li class="dropdown-header">I think...</li>
+        <li><a onclick="usefulSubjectAreaForGroup()">A subject area would be useful for a particular group</a></li>
+
+
+    </ul>
+</div>
+<br>
+
+
+    <!-- MODALS -->
+
+    @feed.additional_actions_options.answerToQuestion()
+    @feed.additional_actions_options.addArtefact()
+    @feed.additional_actions_options.subjectIKnowAbout()
+    @feed.additional_actions_options.suggestNewCategory()
+    @feed.additional_actions_options.subjectSomeoneKnowsAbout()
+
+    <script>
+
+        function answerToQuestion() {$('#answerToQuestion').modal('show');}
+        function addArtefact() {$('#addArtefact').modal('show');}
+        function suggestNewCategory() {$('#suggestNewCategory').modal('show');}
+        function subjectIKnowAbout() {$('#subjectIKnowAbout').modal('show');}
+        function subjectSomeoneKnowsAbout() {$('#subjectSomeoneKnowsAbout').modal('show');}
+        function usefulSubjectAreaForGroup() {$('#suggestNewCategory').modal('show');}
+
+    </script>
+
+
+    <!--end of modal-->
+
+
+
+
+
+
+
+

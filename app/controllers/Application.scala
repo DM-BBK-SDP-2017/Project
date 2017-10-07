@@ -138,11 +138,11 @@ class Application @Inject() (cache: CacheApi)
           val returnComments = Await.result(db.run(getComments.result), Duration.Inf)
 
 
-          Ok(views.html.feed(returnComments, returnResults, loginForm, auth.get.user, Forms.interactionForm))
+          Ok(views.html.feed.feedmain(returnComments, returnResults, loginForm, auth.get.user, Forms.interactionForm))
         } else
-          Ok(views.html.feed(null, null, loginForm, null, null))
+          Ok(views.html.feed.feedmain(null, null, loginForm, null, null))
       }.getOrElse{
-        Ok(views.html.feed(null, null, loginForm, null, null))
+        Ok(views.html.feed.feedmain(null, null, loginForm, null, null))
       }
 
   }
@@ -162,6 +162,8 @@ class Application @Inject() (cache: CacheApi)
 
       val categoryResults: Seq[Category] = Await.result(db.run(allCategoriesQuery.result), Duration.Inf)
       Logger.info("SIZE " + categoryResults.size)
+
+
 
 
       if ( ! auth.isEmpty )

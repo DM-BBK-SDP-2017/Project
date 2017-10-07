@@ -1,5 +1,12 @@
 @import models.Users.User
-@(title: String, loginForm: play.api.data.Form[User], user: String)(content: Html)(implicit messages: Messages)
+@(
+
+        title: String,
+        loginForm: play.api.data.Form[User],
+        user: String,
+        isFeed: Boolean = false
+
+)(content: Html)(implicit flash: Flash)
 @import helper._
 @import play.api.i18n.Messages.Implicits._
 @import play.Logger
@@ -7,95 +14,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>@title</title>
-        <link rel="stylesheet" type="text/css" media="screen" href='@routes.Assets.at("stylesheets/bootstrap.min.css")'>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <script src='@routes.Assets.at("javascripts/jquery-2.1.0.min.js")' type="text/javascript"></script>
-        <script src='@routes.Assets.at("javascripts/bootstrap.min.js")' ></script>
 
-        @*Refresh page after 10 minutes of no activity*@
-        <meta http-equiv="refresh" content="600">
-
-        @*Glyphicons*@
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
-
+        @main_elements.head(title)
 
     </head>
     <body>
-        <nav class="navbar navbar-default" >
 
-            <div class="container-fluid">
-
-
-                @*<div class="navbar-header pull-left">
-                <a class="navbar-brand" href="/"> <img src="/assets/images/favicon.png" class="img-responsive" > </a>
-                </div>*@
-                <div>
-                    <ul class="nav navbar-nav pull-right">
-                        @*<li class="active"><a href="/">Home</a></li>*@
-                        @if(user != null) {
-                            <li><a href="/logout">Logout</a></li>
-
-                        } else {
-                            <li><a href="#login" data-toggle="modal" data-target="#login">Login</a></li>
-                        }
-
-
-                    </ul>
-                </div>
-
-                <div class="navbar-header">
-                @if(user != null) {
-                    <p class="navbar-text" style="color: rgba(21,55,27,0.6)">hello @user
-                    </p>
-                } else {
-                    <p class="navbar-text pull-right" style="color: rgba(21,55,27,0.6) ;"><b>please sign in</b></p>
-                }</div>
-
-            </div>
-        </nav>
+        @main_elements.navbar(user, isFeed)
 
         <div class="container">
 
-
+     @main_elements.flash()(flash)
             @content
 
-
-            <div class="modal fade" id="login" role="dialog">
-                <div class="modal-dialog">
-                        <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Login</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div>
-
-                            @helper.form(action = routes.Application.login()) {
-
-                                <input id="id" name="id" type="hidden" value="0">
-
-                                <div class="input-group">
-                                    <span class="input-group-addon" id="sizing-addon2">username</span>
-                                    <input id="user" name="user" autofocus type="text" class="form-control" placeholder="username" aria-describedby="sizing-addon2">
-                                </div>
-                                <br>
-                                <div class="input-group">
-                                    <span class="input-group-addon" id="sizing-addon2">Password</span>
-                                    <input id="password" name="password" type="text" class="form-control" placeholder="password" aria-describedby="sizing-addon2">
-                                </div>
-                                <br>
-                                <input id="nickname" name="nickname" type="hidden" value="admin">
+            @main_elements.login_form(loginForm)
 
 
-                                <button id = "submitForm" class="btn btn-primary" type="submit">Submit</button>
-                                <button type="button" class="btn" data-dismiss="modal">Close</button>
-                            }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
         </div>
 

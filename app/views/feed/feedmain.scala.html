@@ -1,0 +1,40 @@
+@import models.Artefact
+@import models.Interactions.Interaction
+@import models.Interactions.Comment
+@import models.Users.User
+@(
+        comments: Seq[Comment],
+        artefacts:Seq[Artefact],
+        loginForm:play.api.data.Form[User],
+        user:String,
+        interactionForm:play.api.data.Form[Interaction]
+
+)(implicit flash: Flash)
+
+@main( play.Play.application().configuration().getString("application.name"), loginForm ,user, true) {
+
+
+    @feed.feed_head_elements()
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+            @if(user != null) {
+                <br>
+
+                @feed.additional_actions()
+
+
+                @feed.feed_repeating_artefacts(comments, artefacts)
+
+
+            }   else {
+                <p class="navbar-text pull-right" style="color: rgba(21,55,27,0.6) ;"><b>please sign in</b></p>
+            }
+
+            </div>
+        </div>
+    </div>
+}(flash)

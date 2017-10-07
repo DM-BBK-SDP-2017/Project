@@ -1,0 +1,32 @@
+@()
+
+<div  class="modal fade" id="addArtefact" role="dialog">
+    <div class="modal-dialog" id="addArtefact-modal-dialogue" >
+
+            <!-- Modal content-->
+        <div class="modal-content" id="addArtefact-modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Ask a question</h4>
+            </div>
+            <div class="modal-body" id="addArtefact_modal-body">
+
+                    <!--MODAL CONTENT INSERTED HERE-->
+                <div id="addArtefact_modal-content">
+                    <label class="addArtefactlabel">Category Name</label>
+                    <input class="form-control input-lg" id="editCategoryName" type="text">
+                    <br>
+                    <label class="addArtefactChooser">Choose Parent Category</label>
+                    <input class="form-control input-lg" type="text" id="editCategoryChooser"/>
+                    <br>
+                    <div id="submit_close_buttons">
+                        <button id = "" name="submission_button" class="btn btn-primary" data-dismiss="modal" onClick="addCategory()" type="button">Submit</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onClick="window.location.reload()">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

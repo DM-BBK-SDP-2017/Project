@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 import models.Interactions.Recommendation
-import models.TimeStampFormat
+import models.Utils.TimeStampFormat
 import play.api.libs.json._
 import slick.driver.JdbcProfile
 

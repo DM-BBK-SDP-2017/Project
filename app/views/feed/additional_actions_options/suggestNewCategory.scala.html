@@ -1,0 +1,90 @@
+@()
+
+<div  class="modal fade" id="suggestNewCategory" role="dialog">
+    <div class="modal-dialog" id="suggestNewCategory-modal-dialogue" >
+
+            <!-- Modal content-->
+        <div class="modal-content" id="suggestNewCategory-modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Ask a question</h4>
+            </div>
+            <div class="modal-body" id="suggestNewCategory_modal-body">
+
+                @helper.form(action = routes.Feed_Api.suggestNewCategoryFormResponse()) {
+
+
+
+                    <input id="category_id" name="category_id" type="hidden" value="0">
+                    <input id="parent" name="parent" type="hidden" value="0">
+
+                    <div class="input-group">
+
+                        <span class="input-group-addon" id="sizing-addon2">Choose parent category</span>
+                        <div id="suggestNewCategory_ms" type="text" class="form-control" aria-describedby="sizing-addon2"></div>
+
+                    </div>
+                    <br>
+
+                    <!-- TODO - this form input overlaps dropdown above-->
+
+
+                    <div class="input-group">
+
+                        <span class="input-group-addon" id="sizing-addon2">Enter new category name</span>
+                        <input id="newCategoryName" name="category_name" type="text" class="form-control" aria-describedby="sizing-addon2"></input>
+
+                    </div>
+
+                    <br>
+
+                    <div class="well" >
+                        <h2 id="preview">Preview</h2>
+                    </div>
+
+
+
+                    <br>
+
+
+                    <button id = "submitForm" class="btn btn-primary" type="submit">Submit</button>
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+        $.getJSON("api/categories").success(function categoriesMagicSuggest(cats) {
+            var categoriesEditMS_category_ms = $('#suggestNewCategory_ms').magicSuggest({
+                allowFreeEntries: false,
+                placeholder: 'Select a category',
+                maxSelection: 1,
+                data: cats
+            })
+
+            $(categoriesEditMS_category_ms).on('selectionchange', function(e, cb, s){
+                $('#parent').attr('value', this.getValue()[0])
+
+
+            });
+
+
+
+
+            /* TODO - this preview doesn't work*/
+
+            $('input.newCategoryName').on('input', function() {
+                $('#preview').val(categoriesEditMS_category_ms.getValue()[0] + ' > ' + $('#newCategoryName').val())
+
+            })
+
+        });
+
+
+
+</script>
