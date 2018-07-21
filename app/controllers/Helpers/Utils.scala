@@ -3,6 +3,7 @@ package controllers
 import java.util.Calendar
 
 import models.Users.{Group, User}
+import org.apache.spark.{SparkConf, SparkContext}
 import play.api.{Logger, cache}
 import play.api.libs.json._
 import play.api.mvc.{Request, Result}
@@ -32,6 +33,12 @@ object Utils {
   def logPrinter(str: String) = {
     Logger.info(str)
   }
+
+
+
+
+
+
 
 
 
